@@ -13,11 +13,13 @@ import net.nullved.pmweatherapi.data.PMWStorages;
 import net.nullved.pmweatherapi.radar.storage.RadarStorage;
 import net.nullved.pmweatherapi.radar.storage.RadarStorageData;
 import net.nullved.pmweatherapi.storage.data.BlockPosData;
+import net.nullved.pmweatherapi.storage.data.StorageData;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Get all the radars within a given radius around a {@link BlockPos} or {@link ChunkPos}
@@ -74,15 +76,15 @@ public class NearbyRadars {
      * @since 0.14.15.1
      */
     public Set<BlockPos> radarsNearBlock(BlockPos pos, double radius) {
-        Set<BlockPos> radarList = new HashSet<>();
+        return storage.getAllWithinRange(pos, radius)
+            .stream()
+            .map(StorageData::getPos)
+            .filter(p -> p != pos)
+            .collect(Collectors.toSet());
 
-        for (RadarStorageData radar: storage.getAll()) {
-            if (Math.abs(radar.getPos().distToCenterSqr(pos.getX(), pos.getY(), pos.getZ())) <= radius * radius) radarList.add(radar.getPos());
-        }
-
-        radarList.remove(pos);
-
-        return radarList;
+//        for (RadarStorageData radar: storage.getAll()) {
+//            if (Math.abs(radar.getPos().distToCenterSqr(pos.getX(), pos.getY(), pos.getZ())) <= radius * radius) radarList.add(radar.getPos());
+//        }
     }
 
     /**

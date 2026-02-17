@@ -37,6 +37,36 @@ public abstract class StormEvent extends Event {
     }
 
     /**
+     * Called when a new supercell {@link Storm} is created
+     * @since 0.15.3.3
+     */
+    public static class NewSupercell extends StormEvent {
+        public NewSupercell(Storm storm) {
+            super(storm);
+        }
+    }
+
+    /**
+     * Called when a new squall {@link Storm} is created
+     * @since 0.15.3.3
+     */
+    public static class NewSquall extends StormEvent {
+        public NewSquall(Storm storm) {
+            super(storm);
+        }
+    }
+
+    /**
+     * Called when a new cyclone {@link Storm} is created
+     * @since 0.15.3.3
+     */
+    public static class NewCyclone extends StormEvent {
+        public NewCyclone(Storm storm) {
+            super(storm);
+        }
+    }
+
+    /**
      * Called every tick a {@link Storm} is dying
      * @since 0.14.15.4
      */

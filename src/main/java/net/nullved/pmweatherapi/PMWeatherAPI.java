@@ -5,7 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.ModLoader;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -19,7 +18,7 @@ import net.nullved.pmweatherapi.client.metar.MetarClientStorage;
 import net.nullved.pmweatherapi.client.radar.RadarClientStorage;
 import net.nullved.pmweatherapi.client.radar.WSRClientStorage;
 import net.nullved.pmweatherapi.client.render.IDOverlay;
-import net.nullved.pmweatherapi.client.render.RadarOverlays;
+import net.nullved.pmweatherapi.client.render.radar.RadarOverlays;
 import net.nullved.pmweatherapi.config.PMWClientConfig;
 import net.nullved.pmweatherapi.data.PMWStorages;
 import net.nullved.pmweatherapi.example.ExampleOverlay;
@@ -27,16 +26,12 @@ import net.nullved.pmweatherapi.metar.MetarServerStorage;
 import net.nullved.pmweatherapi.metar.MetarStorage;
 import net.nullved.pmweatherapi.metar.MetarStorageData;
 import net.nullved.pmweatherapi.network.PMWNetworking;
-import net.nullved.pmweatherapi.radar.RadarMode;
 import net.nullved.pmweatherapi.radar.storage.*;
 import net.nullved.pmweatherapi.storage.data.BlockPosData;
 import net.nullved.pmweatherapi.storage.data.StorageDataManager;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
-import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
-
-import java.awt.*;
 
 @Mod(PMWeatherAPI.MODID)
 public class PMWeatherAPI {
@@ -57,7 +52,7 @@ public class PMWeatherAPI {
 
             ArtifactVersion pmweatherVer = pmweather.getModInfo().getVersion();
             String pmweatherVerS = pmweatherVer.getMajorVersion() + "." + pmweatherVer.getMinorVersion() + "." + pmweatherVer.getIncrementalVersion();
-            String pmweatherExpected = "0.15.3-1.21.1-alpha";
+            String pmweatherExpected = "0.16.1-1.21.1-alpha";
             int pmweatherCompared = pmweatherVer.compareTo(new DefaultArtifactVersion(pmweatherExpected));
 
             if (pmweatherCompared == 0) {
@@ -98,7 +93,7 @@ public class PMWeatherAPI {
         PMWClientStorages.registerStorage(WSRStorage.ID, WSRClientStorage.class, WSRClientStorage::new);
 
         RadarOverlays.registerOverlay(() -> IDOverlay.INSTANCE);
-        //RadarOverlays.registerOverlay(() -> ExampleOverlay.INSTANCE);
+//        RadarOverlays.registerOverlay(() -> ExampleOverlay.INSTANCE);
     }
     public static ResourceLocation rl(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);

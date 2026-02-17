@@ -1,12 +1,20 @@
 {
+  "pmweatherapi.configuration.use_original_pmweather_rendering": "Use Original Rendering",
+  "pmweatherapi.configuration.use_original_pmweather_rendering.tooltip": "Disables all custom rendering and optimizations from PMWeatherAPI! Also disables all overlays and custom radar modes!",
+  "pmweatherapi.configuration.darken_biomes_on_radar": "Darken Biomes on Radar",
+  "pmweatherapi.configuration.transparent_background": "Transparent Background",
+  "pmweatherapi.configuration.transparent_background.tooltip": "Only shows weather data, basically replaces black/terrain with transparency",
+  "pmweatherapi.configuration.darken_biomes_on_radar.tooltip": "Darkens biomes by 50% before displaying on the radar. This option also makes it more noisier.",
   "pmweatherapi.configuration.disable_custom_radar_mode_rendering": "Disable Custom Radar Mode Rendering",
-  "pmweatherapi.configuration.disable_custom_radar_mode_rendering.tooltip": "Disables all custom radar modes from rendering. Falls back to PMWeather for Reflectivity and Velocity. Any custom radar modes will not appear, but still be cycled through",
+  "pmweatherapi.configuration.disable_custom_radar_mode_rendering.tooltip": "Disables all custom radar modes from rendering. Falls back to PMWeather for Reflectivity, Velocity, and IR. Any custom radar modes will not appear, but still be cycled through",
   "pmweatherapi.configuration.disable_overlays_when_debugging": "Disable Overlays when Debugging",
   "pmweatherapi.configuration.disable_overlays_when_debugging.tooltip": "Disables all overlays from rendering when client radar debugging is on",
   "pmweatherapi.configuration.show_radar_mode_id": "Show Radar Mode ID",
   "pmweatherapi.configuration.show_radar_mode_id.tooltip": "Enables an overlay to show the current radar mode's ID",
   "pmweatherapi.configuration.radar_mode_id_side": "Radar Mode ID Side",
   "pmweatherapi.configuration.radar_mode_id_side.tooltip": "Determines the side to render the Radar Mode ID Overlay. Does nothing if Show Radar Mode ID is off",
+  "pmweatherapi.configuration.debug": "Debug",
+  "pmweatherapi.configuration.use_original_pmweather_colors": "Use original PMWeather Colors",
 
   "commands.pmweatherapi.non_player": "You must be a player to execute this command!"
 }

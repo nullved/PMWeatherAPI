@@ -1,10 +1,7 @@
 package net.nullved.pmweatherapi.example;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import dev.protomanly.pmweather.block.RadarBlock;
-import dev.protomanly.pmweather.block.entity.RadarBlockEntity;
 import dev.protomanly.pmweather.config.ClientConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -12,13 +9,12 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.render.IRadarOverlay;
-import net.nullved.pmweatherapi.client.render.RenderData;
+import net.nullved.pmweatherapi.client.render.RadarRenderData;
+import net.nullved.pmweatherapi.client.render.radar.IRadarOverlay;
+import net.nullved.pmweatherapi.config.PMWClientConfig;
 import net.nullved.pmweatherapi.radar.NearbyRadars;
 import net.nullved.pmweatherapi.radar.RadarMode;
 import net.nullved.pmweatherapi.storm.NearbyStorms;
-import net.nullved.pmweatherapi.util.ColorMaps;
-import org.joml.Vector3f;
 
 /**
  * This is an example overlay that draws a dot at every lightning strike and fades out
@@ -29,18 +25,24 @@ public class ExampleOverlay implements IRadarOverlay {
     public static final ExampleOverlay INSTANCE = new ExampleOverlay();
 
     @Override
-    public void render(boolean canRender, RenderData renderData, BufferBuilder bufferBuilder, Object... args) {
+    public void render(boolean canRender, RadarRenderData radarRenderData, Object... args) {
         if (!canRender) return;
-        BlockEntity blockEntity = renderData.blockEntity();
+        BlockEntity blockEntity = radarRenderData.blockEntity();
         BlockPos pos = blockEntity.getBlockPos();
-        RadarMode mode = getRadarMode(renderData);
+        RadarMode mode = getRadarMode(radarRenderData);
+//
+//        renderQuad(radarRenderData, 0.0f, 0.005f, 0.0f, 0.03f, radarRenderData.poseStack(), 0xFFFFFFFF, radarRenderData.combinedLightIn());
+//        renderQuad(radarRenderData, -1.0f, 0.005f, -1.0f, 0.03f, radarRenderData.poseStack(), 0xFFFFFFFF, radarRenderData.combinedLightIn());
+//        renderQuad(radarRenderData, -1.0f, 0.005f, 1.0f, 0.03f, radarRenderData.poseStack(), 0xFFFFFFFF, radarRenderData.combinedLightIn());
+//        renderQuad(radarRenderData, 1.0f, 0.005f, 1.0f, 0.03f, radarRenderData.poseStack(), 0xFFFFFFFF, radarRenderData.combinedLightIn());
+//        renderQuad(radarRenderData, 1.0f, 0.005f, -1.0f, 0.03f, radarRenderData.poseStack(), 0xFFFFFFFF, radarRenderData.combinedLightIn());
+
+        renderQuad(radarRenderData, worldToRadarCoordsExp(pos.getCenter(), pos, radarRenderData.sizeRenderDiameter(), radarRenderData.simSize()).add(0.0f, 2.0f, 0.0f), 0.03f, radarRenderData.poseStack(), 0xFFFFFFFF, radarRenderData.combinedLightIn());
 
         if (mode == RadarMode.REFLECTIVITY) {
-            NearbyRadars.client().forRadarNearBlock(pos, 2048,
-                p -> renderMarker(bufferBuilder, renderData, p.offset(-pos.getX(), -pos.getY(), -pos.getZ()).getCenter(), 0xFF880000));
+            NearbyRadars.client().forRadarNearBlock(pos, radarRenderData.simSize(), r -> renderMarker(radarRenderData, r.getCenter(), pos, 0xFF00FF00, 0xFFFF00FF));
         } else if (mode == RadarMode.VELOCITY) {
-            NearbyStorms.client().forStormNearBlock(pos, 2048,
-                s -> renderMarker(bufferBuilder, renderData, s.position.add(-pos.getX(), -pos.getY(), -pos.getZ()), 0xFF008800));
+            NearbyStorms.client().forStormNearBlock(pos, radarRenderData.simSize(), s -> renderMarker(radarRenderData, s.position, pos, 0xFF0000FF, 0xFFFFFF00));
         }
     }
 
@@ -49,22 +51,25 @@ public class ExampleOverlay implements IRadarOverlay {
         return "example";
     }
 
-    private void renderMarker(BufferBuilder bufferBuilder, RenderData renderData, Vec3 relative, int color) {
-        float resolution = ClientConfig.radarResolution;
-        Vector3f radarPos = relative.add(0.5, 0.5, 0.5).toVector3f().mul(3 / (2 * resolution)).div(2048, 0, 2048).div(1.0F / resolution, 0.0F, 1.0F / resolution);
-        Vector3f topLeft = (new Vector3f(-1.0F, 0.0F, -1.0F)).mul(0.015F).add(radarPos.x, 0.005F, radarPos.z);
-        Vector3f bottomLeft = (new Vector3f(-1.0F, 0.0F, 1.0F)).mul(0.015F).add(radarPos.x, 0.005F, radarPos.z);
-        Vector3f bottomRight = (new Vector3f(1.0F, 0.0F, 1.0F)).mul(0.015F).add(radarPos.x, 0.005F, radarPos.z);
-        Vector3f topRight = (new Vector3f(1.0F, 0.0F, -1.0F)).mul(0.015F).add(radarPos.x, 0.005F, radarPos.z);
+    private void renderMarker(RadarRenderData radarRenderData, Vec3 markerLocation, BlockPos radar, int color, int c2) {
+        Vec3 radarPos = worldToRadarCoordsExp(markerLocation, radar, radarRenderData.sizeRenderDiameter(), radarRenderData.simSize());
 
-        PoseStack pose = renderData.poseStack();
+        PoseStack pose = radarRenderData.poseStack();
         pose.pushPose();
-        pose.translate(0.5F, 1.05F, 0.5F);
-        pose.translate(radarPos.x, 0.005F, radarPos.z);
-        pose.scale(0.05F, 0.05F, 0.05F);
-        pose.mulPose(Axis.XP.rotationDegrees(180));
+
+        pose.translate(radarPos.x, 0.05f, radarPos.z);
+        pose.mulPose(Axis.XN.rotationDegrees(90));
+        pose.scale(0.1F, 0.1F, 0.1F);
+
+        renderTexture(PMWeatherAPI.rl("textures/radar/test1.png"), radarRenderData, pose, color);
+
+        if (PMWClientConfig.debug) {
+            pose.pushPose();
+            pose.translate(0, 1, 0);
+            renderTexture(PMWeatherAPI.rl("textures/radar/test2.png"), radarRenderData, pose, c2);
+            pose.popPose();
+        }
 
         pose.popPose();
-        bufferBuilder.addVertex(topLeft).setColor(color).addVertex(bottomLeft).setColor(color).addVertex(bottomRight).setColor(color).addVertex(topRight).setColor(color);
     }
 }

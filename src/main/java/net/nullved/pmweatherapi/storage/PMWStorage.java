@@ -16,6 +16,7 @@ import net.nullved.pmweatherapi.PMWeatherAPI;
 import net.nullved.pmweatherapi.client.data.IClientStorage;
 import net.nullved.pmweatherapi.client.data.PMWClientStorages;
 import net.nullved.pmweatherapi.client.radar.RadarClientStorage;
+import net.nullved.pmweatherapi.config.PMWClientConfig;
 import net.nullved.pmweatherapi.data.PMWStorageSavedData;
 import net.nullved.pmweatherapi.data.PMWStorages;
 import net.nullved.pmweatherapi.event.PMWEvents;
@@ -335,7 +336,7 @@ public abstract class PMWStorage<D extends IStorageData> implements IStorage<D> 
      * @since 0.15.3.3
      */
     public CompoundTag save(CompoundTag tag) {
-        PMWeatherAPI.LOGGER.info("Saving storage {} to level...", getId());
+        if (PMWClientConfig.debug) PMWeatherAPI.LOGGER.info("Saving storage {} to level...", getId());
         if (version() != -1) tag.putInt("version", version());
         tag.putLong("saveTime", System.currentTimeMillis());
 
@@ -355,7 +356,7 @@ public abstract class PMWStorage<D extends IStorageData> implements IStorage<D> 
 
         if (type[0] != null) tag.putString("type", type[0].toString());
 
-        PMWeatherAPI.LOGGER.info("Saved storage {} to level", getId());
+        if (PMWClientConfig.debug) PMWeatherAPI.LOGGER.info("Saved storage {} to level", getId());
         return tag;
     }
 

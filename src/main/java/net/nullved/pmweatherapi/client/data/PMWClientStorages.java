@@ -1,5 +1,6 @@
 package net.nullved.pmweatherapi.client.data;
 
+import dev.protomanly.pmweather.block.entity.RadarBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -38,7 +39,7 @@ public class PMWClientStorages {
      * A {@link Map} of {@link RadarMode}s to {@link Map}s of pixel ids and their {@link Color}
      * @since 0.14.15.6
      */
-    public static Map<BlockPos, Map<RadarMode, Map<Integer, Color>>> RADAR_MODE_COLORS = new HashMap<>();
+    public static Map<RadarBlockEntity, Map<RadarMode, Map<Long, Integer>>> RADAR_MODE_COLORS = new HashMap<>();
 
     public static final Map<ResourceLocation, ClientStorageInstance<?, ?>> STORAGE_INSTANCES = new HashMap<>();
 

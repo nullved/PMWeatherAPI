@@ -1,16 +1,20 @@
 package net.nullved.pmweatherapi.util;
 
 import dev.protomanly.pmweather.weather.Storm;
+import dev.protomanly.pmweather.weather.storms.StormTypes;
 
 /**
  * An enum holding different storm types
  * @since 0.15.0.0
+ * @deprecated Since 0.16.0.0 | Use PMWeather's {@link dev.protomanly.pmweather.weather.storms.StormType} instead as of 0.16.0
  */
+@Deprecated(forRemoval = true, since = "0.16.0.0")
 public enum StormType {
     SUPERCELL(0),
     TORNADO(0, 3),
     SQUALL(1),
-    CYCLONE(2);
+    CYCLONE(2),
+    FIRE_WHIRL(3);
 
     public final int idx, stage;
 
@@ -50,6 +54,19 @@ public enum StormType {
      * @since 0.15.0.0
      */
     public boolean matches(Storm storm) {
-        return storm.stormType == idx && storm.stage >= stage;
+        if (storm.stormType == StormTypes.SUPERCELL && this.idx == 0) {
+            return this != StormType.TORNADO || storm.stage >= 3;
+        } else if (storm.stormType == StormTypes.SQUALL && this.idx == 1) return true;
+        else if (storm.stormType == StormTypes.CYCLONE && this.idx == 2) return true;
+        else return storm.stormType == StormTypes.FIRE_WHIRL && this.idx == 3;
+    }
+
+    public static StormType determineStormType(Storm storm) {
+        if (storm.stormType == StormTypes.SQUALL) return StormType.SQUALL;
+        if (storm.stormType == StormTypes.CYCLONE) return StormType.CYCLONE;
+        if (storm.stormType == StormTypes.FIRE_WHIRL) return StormType.FIRE_WHIRL;
+        if (storm.stormType == StormTypes.SUPERCELL && storm.stage >= 3) return StormType.TORNADO;
+
+        return StormType.SUPERCELL;
     }
 }

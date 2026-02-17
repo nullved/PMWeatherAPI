@@ -1,9 +1,13 @@
 package net.nullved.pmweatherapi.util;
 
+import dev.protomanly.pmweather.block.entity.RadarBlockEntity;
 import dev.protomanly.pmweather.util.ColorTables;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
+import net.nullved.pmweatherapi.config.PMWClientConfig;
 
 import java.awt.Color;
 import java.util.*;
@@ -12,22 +16,22 @@ import java.util.*;
  * A builder-based representation of {@link ColorTables}.
  * Should hopefully be able to produce identical results.
  * <br><br>
- * You can create a new {@link ColorMap} builder with {@link ColorMap.Builder#of(Color)}.
- * Use {@link Builder#addPoint(Color, float)} to add a new point to lerp between.
- * Use {@link Builder#override(Color, float)} to add a new point to override the color at.
+ * You can create a new {@link ColorMap} builder with {@link ColorMap.Builder#of(int)}.
+ * Use {@link Builder#addPoint(int, float)} to add a new point to lerp between.
+ * Use {@link Builder#override(int, float)} to add a new point to override the color at.
  * @since 0.14.15.6
  */
 public class ColorMap {
     private final boolean overrideModeGreater;
     private final NavigableMap<Float, LerpSegment> segments;
-    private final NavigableMap<Float, Color> overridePoints;
-    private final Color base;
+    private final NavigableMap<Float, Integer> overridePoints;
+    private final int base;
 
     private final float min, max, firstThreshold;
-    private Color[] lookup;
+    private int[] lookup;
     private float resolution;
 
-    private ColorMap(Color base, boolean overrideModeGreater, List<LerpSegment> segments, NavigableMap<Float, Color> overridePoints, float resolution) {
+    private ColorMap(int base, boolean overrideModeGreater, List<LerpSegment> segments, NavigableMap<Float, Integer> overridePoints, float resolution) {
         this.min = Math.round(segments.getFirst().start / resolution) * resolution;
         this.max = Math.round(segments.getLast().end / resolution) * resolution;
         this.firstThreshold = segments.getFirst().end;
@@ -69,7 +73,7 @@ public class ColorMap {
     public void recomputeLookups(float resolution) {
         this.resolution = resolution;
         int size = (int) (((max - min) / resolution) + 1);
-        this.lookup = new Color[size];
+        this.lookup = new int[size];
 
         for (int i = 0; i < size; i++) {
             float val = min + i * resolution;
@@ -85,7 +89,7 @@ public class ColorMap {
      * @since 0.14.16.1
      * @see #getAccurate(float)
      */
-    public Color get(float val) {
+    public int get(float val) {
         float newVal = Math.round(val / resolution) * resolution;
         if (newVal <= min) return lookup[0];
         if (newVal >= max) return lookup[lookup.length - 1];
@@ -97,21 +101,28 @@ public class ColorMap {
      * Retrieves the color value using a color derived from the biome
      * @param val The value to get a color for
      * @param biome The biome to derive the starting color from
-     * @param worldPos The world position (for grass color checks)
+     * @param wx The world x position (for grass color checks)
+     * @param wz The world z position (for grass color checks)
      * @return The approximate color for this value
      * @since 0.15.0.0
      */
-    public Color getWithBiome(float val, Holder<Biome> biome, Vec3 worldPos) {
-        Color startColor;
+    public int getWithBiome(float val, Holder<Biome> biome, double wx, double wz) {
+        int startColor;
         String rn = biome.getRegisteredName().toLowerCase();
-        if (rn.contains("ocean") || rn.contains("river")) startColor = new Color(biome.value().getWaterColor());
-        else if (rn.contains("beach") || rn.contains("desert")) {
-            if (rn.contains("badlands")) startColor = new Color(214, 111, 42);
-            else startColor = new Color(227, 198, 150);
-        } else startColor = new Color(biome.value().getGrassColor(worldPos.x, worldPos.z));
+        if (rn.contains("ocean") || rn.contains("river")) startColor = 0xFF000000 | biome.value().getWaterColor();
+        else if (rn.contains("beach") || rn.contains("desert")) startColor = 0xFFE3C696;
+        else if (rn.contains("badlands")) startColor = 0xFFD66F2A;
+        else startColor = 0xFF000000 | biome.value().getGrassColor(wx, wz);
 
         if (val < firstThreshold) {
             return lerp(Math.clamp(val / (firstThreshold - min), 0.0F, 1.0F), startColor, segments.firstEntry().getValue().to);
+        } else return get(val);
+    }
+
+    public int getWithTerrainMap(float val, RadarBlockEntity rbe, double x, double z) {
+        if (val < firstThreshold) {
+            long longID = (long) (x + resolution + 1) + (long) (z + resolution + 1) * ((long) resolution * 2L + 1L);
+            return lerp(Math.clamp(val / (firstThreshold - min), 0.0F, 1.0F), rbe.terrainMap.getOrDefault(longID, Color.BLACK).getRGB(), segments.firstEntry().getValue().to);
         } else return get(val);
     }
 
@@ -125,10 +136,10 @@ public class ColorMap {
      * @since 0.14.15.6
      * @see #get(float)
      */
-    public Color getAccurate(float val) {
-        Color currentColor = base;
+    public int getAccurate(float val) {
+        int currentColor = base;
 
-        Map.Entry<Float, Color> override = overridePoints.floorEntry(val);
+        Map.Entry<Float, Integer> override = overridePoints.floorEntry(val);
         if (override != null) {
             currentColor = override.getValue();
         }
@@ -146,6 +157,11 @@ public class ColorMap {
         return currentColor;
     }
 
+    public static int lerpBlackTransparent(float delta, int c1, int c2) {
+        if (c2 == 0xFF000000 && PMWClientConfig.transparentBackground) c2 = 0x00000000;
+        return lerp(delta, c1, c2);
+    }
+
     /**
      * Lerps between two colors
      * @param delta The t-value from 0 to 1
@@ -154,11 +170,24 @@ public class ColorMap {
      * @return A {@link Color} lerped between c1 and c2
      * @since 0.14.15.6
      */
-    public static Color lerp(float delta, Color c1, Color c2) {
-        float r = c1.getRed() + delta * (c2.getRed() - c1.getRed());
-        float g = c1.getGreen() + delta * (c2.getGreen() - c1.getGreen());
-        float b = c1.getBlue() + delta * (c2.getBlue() - c1.getBlue());
-        return new Color((int) r, (int) g, (int) b);
+    public static int lerp(float delta, int c1, int c2) {
+        return FastColor.ARGB32.lerp(delta, c1, c2);
+//
+//        int a1 = (c1 >> 24) & 0xFF;
+//        int r1 = (c1 >> 16) & 0xFF;
+//        int g1 = (c1 >> 8) & 0xFF;
+//        int b1 = c1 & 0xFF;
+//
+//        int a2 = (c2 >> 24) & 0xFF;
+//        int r2 = (c2 >> 16) & 0xFF;
+//        int g2 = (c2 >> 8) & 0xFF;
+//        int b2 = c2 & 0xFF;
+//
+//        int a = (int) (a1 + delta * (a2 - a1));
+//        int r = (int) (r1 + delta * (r2 - r1));
+//        int g = (int) (g1 + delta * (g2 - g1));
+//        int b = (int) (b1 + delta * (b2 - b1));
+//        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
     /**
@@ -169,7 +198,7 @@ public class ColorMap {
      * @param to The ending {@link Color}
      * @since 0.14.15.6
      */
-    public record LerpSegment(float start, Color from, float end, Color to) {}
+    public record LerpSegment(float start, int from, float end, int to) {}
 
     /**
      * A Builder pattern for creating a {@link ColorMap}
@@ -177,13 +206,13 @@ public class ColorMap {
      */
     public static class Builder {
         private final List<LerpSegment> segments = new ArrayList<>();
-        private final NavigableMap<Float, Color> overridePoints = new TreeMap<>();
-        private final Color base;
+        private final NavigableMap<Float, Integer> overridePoints = new TreeMap<>();
+        private final Integer base;
         private boolean overrideModeGreater = false;
         private float lastThreshold = Float.NEGATIVE_INFINITY, resolution = 0.1F;
-        private Color lastColor;
+        private Integer lastColor;
 
-        private Builder(Color base) {
+        private Builder(Integer base) {
             this.base = base;
             this.lastColor = base;
         }
@@ -194,18 +223,18 @@ public class ColorMap {
          * @return The created {@link Builder}
          * @since 0.14.15.6
          */
-        public static Builder of(Color base) {
+        public static Builder of(int base) {
             return new Builder(base);
         }
 
         /**
          * Creates a new {@link ColorMap.Builder} that has a default {@link Color#BLACK} base.
-         * This method has no effect unless you use {@link ColorMap#getWithBiome(float, Holder, Vec3)}
+         * This method has no effect unless you use {@link ColorMap#getWithBiome(float, Holder, double, double)}
          * @return The created {@link ColorMap.Builder}
          * @since 0.15.0.0
          */
         public static Builder biome() {
-            return new Builder(Color.BLACK);
+            return new Builder(0xFF000000);
         }
 
         /**
@@ -238,7 +267,7 @@ public class ColorMap {
          * @return This {@link Builder}
          * @since 0.14.15.6
          */
-        public Builder addPoint(Color color, float threshold) {
+        public Builder addPoint(int color, float threshold) {
             if (lastThreshold != Float.NEGATIVE_INFINITY) {
                 segments.add(new LerpSegment(lastThreshold, lastColor, threshold, color));
             }
@@ -254,7 +283,7 @@ public class ColorMap {
          * @return This {@link Builder}
          * @since 0.14.15.6
          */
-        public Builder override(Color color, float threshold) {
+        public Builder override(int color, float threshold) {
             overridePoints.put(threshold, color);
             lastThreshold = threshold;
             lastColor = color;
@@ -268,7 +297,7 @@ public class ColorMap {
          * @return A completed {@link ColorMap}
          * @since 0.14.15.6
          */
-        public ColorMap build(Color finalColor, float finalThreshold) {
+        public ColorMap build(int finalColor, float finalThreshold) {
             if (!segments.isEmpty()) {
                 LerpSegment first = segments.getFirst();
                 if (first.start > 0.0F) {

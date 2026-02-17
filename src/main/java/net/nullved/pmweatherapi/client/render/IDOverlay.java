@@ -1,6 +1,5 @@
 package net.nullved.pmweatherapi.client.render;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -8,6 +7,8 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.nullved.pmweatherapi.PMWeatherAPI;
+import net.nullved.pmweatherapi.client.render.radar.IRadarOverlay;
+import net.nullved.pmweatherapi.client.render.radar.RadarOverlays;
 import net.nullved.pmweatherapi.config.PMWClientConfig;
 import net.nullved.pmweatherapi.radar.RadarMode;
 
@@ -24,15 +25,15 @@ public class IDOverlay implements IRadarOverlay {
     public static final IRadarOverlay INSTANCE = new IDOverlay();
 
     @Override
-    public void render(boolean canRender, RenderData renderData, BufferBuilder bufferBuilder, Object... args) {
+    public void render(boolean canRender, RadarRenderData radarRenderData, Object... args) {
         if (!PMWClientConfig.showRadarModeId) return;
         if (!Minecraft.getInstance().player.isCrouching()) return;
 
-        RadarMode mode = getRadarMode(renderData);
-        PoseStack poseStack = renderData.poseStack();
+        RadarMode mode = getRadarMode(radarRenderData);
+        PoseStack poseStack = radarRenderData.poseStack();
         PMWClientConfig.RadarModeIDSide side = PMWClientConfig.radarModeIDSide;
 
-        float scale = renderData.sizeRenderDiameter() / 3.0F;
+        float scale = radarRenderData.sizeRenderDiameter() / 3.0F;
 
         poseStack.pushPose();
         poseStack.translate((side.x * scale) - 0.5F * (scale - 1), 1.055f, (side.z * scale) - 0.5F * (scale - 1));
@@ -40,7 +41,7 @@ public class IDOverlay implements IRadarOverlay {
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
         poseStack.scale(0.01f, 0.01f, 0.01f);
 
-        renderText(Component.literal(mode.getId().toString()), renderData, poseStack);
+        renderText(Component.literal(mode.getId().toString()), radarRenderData, poseStack);
 
         poseStack.mulPose(Axis.XP.rotationDegrees(-90));
 
@@ -53,18 +54,13 @@ public class IDOverlay implements IRadarOverlay {
             poseStack.scale(0.6f, 0.6f, 0.6f);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            renderText(Component.literal(overlay.get().getID().toString()).withColor(0x888888), renderData, poseStack);
+            renderText(Component.literal(overlay.get().getID().toString()).withColor(0xBBBBBB), radarRenderData, poseStack);
 
             poseStack.popPose();
             offset += lineHeight * 0.6f;
         }
 
         poseStack.popPose();
-
-        // While I could reset the pose, it is not strictly necessary
-        // poseStack.scale(100f, 100f, 100f);
-        // poseStack.mulPose(Axis.ZP.rotationDegrees(-side.rotation));
-        // poseStack.translate(-side.x, -1.055f, -side.z);
     }
 
     @Override

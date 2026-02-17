@@ -6,11 +6,13 @@ import dev.protomanly.pmweather.event.GameBusEvents;
 import dev.protomanly.pmweather.weather.Storm;
 import dev.protomanly.pmweather.weather.WeatherHandler;
 import dev.protomanly.pmweather.weather.WeatherHandlerServer;
+import dev.protomanly.pmweather.weather.storms.StormSpawnProperties;
+import dev.protomanly.pmweather.weather.storms.StormType;
+import dev.protomanly.pmweather.weather.storms.StormTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.nullved.pmweatherapi.util.StormType;
 
 /**
  * A builder for {@link Storm}s that makes it easy to create and spawn them.
@@ -283,12 +285,17 @@ public class StormBuilder {
      * @since 0.14.15.5
      */
     public Storm build() {
-        Storm storm = new Storm(weatherHandler, weatherHandler.getWorld(), risk, type.idx());
+        Storm storm = type.create(new StormSpawnProperties(
+            weatherHandler,
+            weatherHandler.getWorld(),
+            position,
+            risk
+        ));
         storm.initFirstTime();
         storm.visualOnly = visualOnly;
         storm.velocity = velocity;
         if (aimAtPlayer != null) {
-            if (storm.stormType != StormType.SQUALL.idx()) {
+            if (storm.stormType != StormTypes.SQUALL) {
                 Vec3 aimPos = aimAtPlayer.position().add(new Vec3((double)(PMWeather.RANDOM.nextFloat() - 0.5F) * ServerConfig.aimAtPlayerOffset, 0.0F, (double)(PMWeather.RANDOM.nextFloat() - 0.5F) * ServerConfig.aimAtPlayerOffset));
                 if (storm.position.distanceTo(aimPos) >= ServerConfig.aimAtPlayerOffset) {
                     Vec3 toward = storm.position.subtract(new Vec3(aimPos.x, storm.position.y, aimPos.z)).multiply(1.0F, 0.0F, 1.0F).normalize();
@@ -300,7 +307,7 @@ public class StormBuilder {
             }
         }
         if (aimAtAnyPlayer) {
-            if (storm.stormType != StormType.SQUALL.idx()) {
+            if (storm.stormType != StormTypes.SQUALL) {
                 Player nearest = storm.level.getNearestPlayer(this.position.x, this.position.y, this.position.z, 4096.0F, false);
                 if (nearest != null) {
                     Vec3 aimPos = aimAtPlayer.position().add(new Vec3((double) (PMWeather.RANDOM.nextFloat() - 0.5F) * ServerConfig.aimAtPlayerOffset, 0.0F, (double) (PMWeather.RANDOM.nextFloat() - 0.5F) * ServerConfig.aimAtPlayerOffset));
@@ -316,7 +323,7 @@ public class StormBuilder {
             }
         }
         storm.position = position;
-        storm.stage = Math.max(stage, type.stage());
+        storm.stage = stage;
         storm.maxStage = maxStage;
         storm.energy = energy;
         storm.width = width;

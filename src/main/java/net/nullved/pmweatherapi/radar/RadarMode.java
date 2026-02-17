@@ -9,11 +9,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.biome.Biome;
 import net.nullved.pmweatherapi.client.render.PixelRenderData;
-import net.nullved.pmweatherapi.client.render.RadarOverlays;
+import net.nullved.pmweatherapi.client.render.radar.RadarOverlays;
+import net.nullved.pmweatherapi.config.PMWClientConfig;
 import net.nullved.pmweatherapi.data.PMWExtras;
 import net.nullved.pmweatherapi.util.ColorMap;
 import net.nullved.pmweatherapi.util.ColorMaps;
-import net.nullved.pmweatherapi.util.StringValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -32,7 +32,7 @@ import java.util.function.Function;
  * For each radar mode, you must define a function taking in a {@link PixelRenderData} and returning a {@link Color}.
  * This function is run for every pixel on the radar, so try to make it performant.
  * <br><br>
- * You can also define a custom dot color with {@link #create(ResourceLocation, Function, Color)} (this supports transparency)
+ * You can also define a custom dot color with {@link #create(ResourceLocation, Function, int)} (this supports transparency)
  * <br><br>
  * You may also be looking to overlay something on top of the radar instead.
  * If this is what you are looking to do, checkout {@link RadarOverlays} instead
@@ -50,18 +50,28 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      * @since 0.14.15.6
      */
     public static final RadarMode NULL = new RadarMode(ResourceLocation.parse("null"), prd -> {
-        if ((prd.x() > 0 && prd.z() > 0) || (prd.x() <= 0 && prd.z() <= 0)) return new Color(1.0F, 0, 1.0F);
-        else return Color.BLACK;
-    }, new Color(0, 0, 0, 0));
+        if ((prd.x() > 0 && prd.z() > 0) || (prd.x() <= 0 && prd.z() <= 0)) return 0xFFFF00FF;
+        else return 0xFF000000;
+    }, 0x00000000);
 
     /**
      * A Radar Mode that is a copy of PMWeather's Reflectivity
      * @since 0.14.15.6
      */
     public static final RadarMode REFLECTIVITY = create(PMWeather.getPath("reflectivity"), prd -> {
-        Holder<Biome> biome = ((RadarBlockEntity) prd.renderData().blockEntity()).getNearestBiome(new BlockPos((int) prd.worldPos().x, (int) prd.worldPos().y, (int) prd.worldPos().z));
-        if (biome != null) return ColorMaps.REFLECTIVITY.getWithBiome(prd.rdbz(), biome, prd.worldPos());
-        else return ColorMaps.REFLECTIVITY.get(prd.rdbz());
+        Holder<Biome> biome = prd.radarRenderData().blockEntity().getNearestBiome(new BlockPos((int) prd.wx(), prd.radarRenderData().blockEntity().getBlockPos().getY(), (int) prd.wz()));
+//        if (prd.rdbz() < 5.0f && PMWClientConfig.transparentBackground) return 0x00000000;
+
+        int color = biome != null
+            ? ColorMaps.REFLECTIVITY.getWithTerrainMap(prd.rdbz(), prd.radarRenderData().blockEntity(), prd.x(), prd.z())
+            : ColorMaps.REFLECTIVITY.get(prd.rdbz());
+
+        if (prd.rdbz() > 5.0F && !prd.radarRenderData().blockEntity().hasRangeUpgrade) {
+            if (prd.temp() < 3.0F && prd.temp() > 1.0F) color = ColorMaps.MIXED_REFLECTIVITY.get(prd.rdbz());
+            else if (prd.temp() <= -1.0F) color = ColorMaps.SNOW_REFLECTIVITY.get(prd.rdbz());
+        }
+
+        return color;
     });
 
     /**
@@ -69,9 +79,9 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      * @since 0.14.15.6
      */
     public static final RadarMode VELOCITY = create(PMWeather.getPath("velocity"), prd -> {
-        Color velCol = prd.velocity() >= 0.0F ? ColorMaps.POSITIVE_VELOCITY.get(prd.velocity() / 1.75F) : ColorMaps.NEGATIVE_VELOCITY.get(-prd.velocity() / 1.75F);
+        int velCol = prd.velocity() >= 0.0F ? ColorMaps.POSITIVE_VELOCITY.get(prd.velocity() / 1.75F) : ColorMaps.NEGATIVE_VELOCITY.get(-prd.velocity() / 1.75F);
 
-        return ColorMap.lerp(Mth.clamp(Math.max(prd.rdbz(), (Mth.abs(prd.velocity() / 1.75F) - 18.0F) / 0.65F) / 12.0F, 0.0F, 1.0F), Color.BLACK, velCol);
+        return ColorMap.lerp(Mth.clamp(Math.max(prd.rdbz(), (Mth.abs(prd.velocity() / 1.75F) - 18.0F) / 0.65F) / 12.0F, 0.0F, 1.0F), 0xFF000000, velCol);
     });
 
     /**
@@ -94,9 +104,9 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
     });
 
     private final ResourceLocation id;
-    private final Function<PixelRenderData, Color> colorFunction;
-    private final Color dotColor;
-    private RadarMode(ResourceLocation id, Function<PixelRenderData, Color> colorFunction, Color dotColor) {
+    private final Function<PixelRenderData, Integer> colorFunction;
+    private final Integer dotColor;
+    private RadarMode(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction, Integer dotColor) {
         this.id = id;
         this.colorFunction = colorFunction;
         this.dotColor = dotColor;
@@ -128,20 +138,20 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      * @return A new {@link RadarMode}
      * @since 0.14.15.6
      */
-    public static RadarMode create(ResourceLocation id, Function<PixelRenderData, Color> colorFunction, Color renderDotColor) {
+    public static RadarMode create(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction, int renderDotColor) {
         return MODES.computeIfAbsent(id, nm -> new RadarMode(id, colorFunction, renderDotColor));
     }
 
     /**
      * Create a new {@link RadarMode} with a red dot at the center.
-     * To set a custom dot color, use {@link #create(ResourceLocation, Function, Color)}
+     * To set a custom dot color, use {@link #create(ResourceLocation, Function, int)}
      * @param id The {@link ResourceLocation} of this radar mode
      * @param colorFunction The {@link Function} mapping a {@link PixelRenderData} to a {@link Color}. Runs for every pixel
      * @return A new {@link RadarMode}
      * @since 0.14.15.6
      */
-    public static RadarMode create(ResourceLocation id, Function<PixelRenderData, Color> colorFunction) {
-        return create(id, colorFunction, Color.RED);
+    public static RadarMode create(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction) {
+        return create(id, colorFunction, 0xFFFF0000);
     }
 
     /**
@@ -202,7 +212,7 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      * @return The dot {@link Color}
      * @since 0.14.15.6
      */
-    public Color getDotColor() {
+    public int getDotColor() {
         return dotColor;
     }
 
@@ -212,17 +222,8 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      * @return The {@link Color} to draw to the pixel
      * @since 0.14.15.6
      */
-    public Color getColorForPixel(PixelRenderData pixelRenderData) {
+    public int getColorForPixel(PixelRenderData pixelRenderData) {
         return colorFunction.apply(pixelRenderData);
-    }
-
-    /**
-     * Gets this {@link RadarMode} expressed as a {@link StringValue}
-     * @return A {@link StringValue}
-     * @since 0.14.15.6
-     */
-    public StringValue stringValue() {
-        return new StringValue(getSerializedName());
     }
 
     /**

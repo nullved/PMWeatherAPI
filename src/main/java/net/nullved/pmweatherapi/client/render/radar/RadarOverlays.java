@@ -1,14 +1,13 @@
-package net.nullved.pmweatherapi.client.render;
+package net.nullved.pmweatherapi.client.render.radar;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.nullved.pmweatherapi.PMWeatherAPI;
+import net.nullved.pmweatherapi.client.render.RadarRenderData;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -31,15 +30,14 @@ public class RadarOverlays {
     /**
      * Renders all overlays
      * @param canRender {@code true} if either the server doesn't require WSR-88D or a WSR-88D is complete within 4 chunks of the radar
-     * @param renderData The data used to call {@link BlockEntityRenderer#render(BlockEntity, float, PoseStack, MultiBufferSource, int, int)}
-     * @param bufferBuilder The {@link BufferBuilder} to render overlays to
+     * @param radarRenderData The data used to call {@link BlockEntityRenderer#render(BlockEntity, float, PoseStack, MultiBufferSource, int, int)}
      * @since 0.14.15.0
      */
-    public static void renderOverlays(RenderData renderData, BufferBuilder bufferBuilder, boolean canRender) {
+    public static void renderOverlays(RadarRenderData radarRenderData, boolean canRender) {
         OVERLAYS.forEach((overlay, args) -> {
-            renderData.poseStack().pushPose();
-            overlay.get().render(canRender, renderData, bufferBuilder, args);
-            renderData.poseStack().popPose();
+            radarRenderData.poseStack().pushPose();
+            overlay.get().render(canRender, radarRenderData, args);
+            radarRenderData.poseStack().popPose();
         });
     }
 
