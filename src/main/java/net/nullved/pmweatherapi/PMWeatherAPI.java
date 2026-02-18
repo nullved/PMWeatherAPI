@@ -1,6 +1,8 @@
 package net.nullved.pmweatherapi;
 
 import com.mojang.logging.LogUtils;
+import dev.protomanly.pmweather.addons.AddonHelper;
+import dev.protomanly.pmweather.addons.AddonInfo;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -32,6 +34,9 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Mod(PMWeatherAPI.MODID)
 public class PMWeatherAPI {
     public static final String MODID = "pmweatherapi";
@@ -43,6 +48,10 @@ public class PMWeatherAPI {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::registerPayloads);
+
+        AddonHelper.registerAddon(new AddonInfo(modContainer, new ArrayList<>(){{
+            add("0.16");
+        }}));
 
         LOGGER.info("Initialized PMWAPI");
 

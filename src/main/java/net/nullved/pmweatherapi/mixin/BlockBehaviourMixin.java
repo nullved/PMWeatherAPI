@@ -67,7 +67,7 @@ public class BlockBehaviourMixin {
         } else if (state.getBlock() instanceof MetarBlock) {
             MetarServerStorage metarStorage = PMWStorages.metars().get(level.dimension());
             metarStorage.removeAndSync(pos);
-        }else if (state.getBlock() instanceof WSR88DCore wsr) {
+        } else if (state.getBlock() instanceof WSR88DCore) {
             PMWStorages.wsrs().get(level.dimension()).removeAndSync(pos);
         }
     }

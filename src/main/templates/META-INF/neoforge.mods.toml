@@ -39,6 +39,6 @@ side = "BOTH"
 modId = "pmweather"
 type = "required"
 versionRange = "${pmweather_version_range}"
-ordering = "BEFORE"
+ordering = "AFTER"
 side = "BOTH"
 
