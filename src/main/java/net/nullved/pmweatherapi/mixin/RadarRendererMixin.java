@@ -9,6 +9,7 @@ import dev.protomanly.pmweather.block.RadarBlock;
 import dev.protomanly.pmweather.block.entity.RadarBlockEntity;
 import dev.protomanly.pmweather.config.ClientConfig;
 import dev.protomanly.pmweather.config.ServerConfig;
+import dev.protomanly.pmweather.data.DataAttachments;
 import dev.protomanly.pmweather.event.GameBusClientEvents;
 import dev.protomanly.pmweather.multiblock.wsr88d.WSR88DCore;
 import dev.protomanly.pmweather.render.RadarRenderer;
@@ -25,6 +26,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -206,11 +208,15 @@ public class RadarRendererMixin {
                 color = pmwapi$getCTPixelColor(radarBlockEntity, rdbz, startColor, temp, radarMode, vel);
             }
 
-            if (ClientConfig.radarDebugging && update) {
+            if (ClientConfig.radarDebugging) {
                 Color dbg = radarBlockEntity.debugMap.getOrDefault(longID, Color.BLACK);
-                dbg = pmwapi$getClientDebugColor(radarBlockEntity, clientRadarMode, wx, pos.getY(), wz, dbg, x, z, (float) resolution, pos, storms);
+
+                if (update) {
+                    dbg = pmwapi$getClientDebugColor(radarBlockEntity, clientRadarMode, wx, pos.getY(), wz, dbg, x, z, (float) resolution, pos, storms);
+                    radarBlockEntity.debugMap.put(longID, dbg);
+                }
+
                 color = dbg.getRGB();
-                radarBlockEntity.debugMap.put(longID, new Color(color));
             }
 
             if (!RadarMode.isBaseRenderingDisabled()) {
@@ -473,6 +479,18 @@ public class RadarRendererMixin {
             } else {
                 return ColorTables.lerp(Mth.clamp(lapse / 5.0F, 0.0F, 1.0F), new Color(0, 255, 0), new Color(255, 255, 0));
             }
+        }
+
+        if (clientRadarMode == ClientConfig.RadarMode.FIRE) {
+            Vec3 wP = (new Vec3(x, 0.0F, z)).multiply((1.0F / resolution), 0.0F, (1.0F / resolution)).multiply(256.0F, 0.0F, 256.0F).add(pos.getCenter());
+            ChunkAccess chunkAccess = radarBlockEntity.getLevel().getChunk(new BlockPos((int)wP.x(), (int)wP.y(), (int)wP.z()));
+            float fireIntensity = (Float)chunkAccess.getData(DataAttachments.STABLE_FIRE_INTENSITY);
+            return ColorTables.lerp(Mth.clamp(fireIntensity / 25.0F, 0.0F, 1.0F), new Color(255, 255, 255), new Color(255, 98, 0));
+        }
+
+        if (clientRadarMode == ClientConfig.RadarMode.PRECIPITATION) {
+            float precipitation = GameBusClientEvents.weatherHandler.getPrecipitation(worldPos);
+            return ColorTables.lerp(Mth.clamp(precipitation, 0.0F, 1.0F), new Color(0, 0, 0), new Color(0, 13, 255));
         }
 
         return def;

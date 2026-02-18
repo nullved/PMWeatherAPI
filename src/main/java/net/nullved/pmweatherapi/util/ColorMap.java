@@ -114,6 +114,8 @@ public class ColorMap {
         else if (rn.contains("badlands")) startColor = 0xFFD66F2A;
         else startColor = 0xFF000000 | biome.value().getGrassColor(wx, wz);
 
+        if (PMWClientConfig.darkenBiomesOnRadar) startColor = 0xFF000000 | ColorMap.lerp(0.5F, startColor, 0xFF000000);
+
         if (val < firstThreshold) {
             return lerp(Math.clamp(val / (firstThreshold - min), 0.0F, 1.0F), startColor, segments.firstEntry().getValue().to);
         } else return get(val);

@@ -36,10 +36,11 @@ public class IDOverlay implements IRadarOverlay {
         float scale = radarRenderData.sizeRenderDiameter() / 3.0F;
 
         poseStack.pushPose();
-        poseStack.translate((side.x * scale) - 0.5F * (scale - 1), 1.055f, (side.z * scale) - 0.5F * (scale - 1));
+        poseStack.translate((side.x * scale) - 0.5F * (scale - 1) - 0.5F, 0.005f, (side.z * scale) - 0.5F * (scale - 1) - 0.5F);
         poseStack.mulPose(Axis.YN.rotationDegrees(side.rotation));
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
-        poseStack.scale(0.01f, 0.01f, 0.01f);
+        poseStack.scale(0.01F, 0.01F, 0.01F);
+        poseStack.scale(scale, scale, scale);
 
         renderText(Component.literal(mode.getId().toString()), radarRenderData, poseStack);
 
@@ -48,13 +49,13 @@ public class IDOverlay implements IRadarOverlay {
 
         float lineHeight = 8.0f;
         float offset = lineHeight;
-        for (Supplier<? extends IRadarOverlay> overlay: RadarOverlays.getOverlays()) {
+        for (IRadarOverlay overlay: RadarOverlays.getOverlays()) {
             poseStack.pushPose();
             poseStack.translate(0, 0, offset);
             poseStack.scale(0.6f, 0.6f, 0.6f);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            renderText(Component.literal(overlay.get().getID().toString()).withColor(0xBBBBBB), radarRenderData, poseStack);
+            renderText(Component.literal(overlay.getID().toString()).withColor(0xBBBBBB), radarRenderData, poseStack);
 
             poseStack.popPose();
             offset += lineHeight * 0.6f;

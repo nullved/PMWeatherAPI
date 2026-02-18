@@ -52,18 +52,18 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
     public static final RadarMode NULL = new RadarMode(ResourceLocation.parse("null"), prd -> {
         if ((prd.x() > 0 && prd.z() > 0) || (prd.x() <= 0 && prd.z() <= 0)) return 0xFFFF00FF;
         else return 0xFF000000;
-    }, 0x00000000);
+    }, 0x00000000, true);
 
     /**
      * A Radar Mode that is a copy of PMWeather's Reflectivity
      * @since 0.14.15.6
      */
-    public static final RadarMode REFLECTIVITY = create(PMWeather.getPath("reflectivity"), prd -> {
+    public static final RadarMode REFLECTIVITY = createInternal(PMWeather.getPath("reflectivity"), prd -> {
         Holder<Biome> biome = prd.radarRenderData().blockEntity().getNearestBiome(new BlockPos((int) prd.wx(), prd.radarRenderData().blockEntity().getBlockPos().getY(), (int) prd.wz()));
 //        if (prd.rdbz() < 5.0f && PMWClientConfig.transparentBackground) return 0x00000000;
 
         int color = biome != null
-            ? ColorMaps.REFLECTIVITY.getWithTerrainMap(prd.rdbz(), prd.radarRenderData().blockEntity(), prd.x(), prd.z())
+            ? ColorMaps.REFLECTIVITY.getWithBiome(prd.rdbz(), biome, prd.x(), prd.z())
             : ColorMaps.REFLECTIVITY.get(prd.rdbz());
 
         if (prd.rdbz() > 5.0F && !prd.radarRenderData().blockEntity().hasRangeUpgrade) {
@@ -78,7 +78,7 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      * A Radar Mode that is a copy of PMWeather's Velocity
      * @since 0.14.15.6
      */
-    public static final RadarMode VELOCITY = create(PMWeather.getPath("velocity"), prd -> {
+    public static final RadarMode VELOCITY = createInternal(PMWeather.getPath("velocity"), prd -> {
         int velCol = prd.velocity() >= 0.0F ? ColorMaps.POSITIVE_VELOCITY.get(prd.velocity() / 1.75F) : ColorMaps.NEGATIVE_VELOCITY.get(-prd.velocity() / 1.75F);
 
         return ColorMap.lerp(Mth.clamp(Math.max(prd.rdbz(), (Mth.abs(prd.velocity() / 1.75F) - 18.0F) / 0.65F) / 12.0F, 0.0F, 1.0F), 0xFF000000, velCol);
@@ -88,7 +88,7 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      * A Radar Mode that is a copy of PMWeather's IR
      * @since 0.15.0.0
      */
-    public static final RadarMode IR = create(PMWeather.getPath("ir"), prd -> {
+    public static final RadarMode IR = createInternal(PMWeather.getPath("ir"), prd -> {
         float rdbz = prd.rdbz();
         float ir = rdbz * 10.0F;
 
@@ -106,10 +106,16 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
     private final ResourceLocation id;
     private final Function<PixelRenderData, Integer> colorFunction;
     private final Integer dotColor;
-    private RadarMode(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction, Integer dotColor) {
+    private final boolean custom;
+    private RadarMode(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction, Integer dotColor, boolean custom) {
         this.id = id;
         this.colorFunction = colorFunction;
         this.dotColor = dotColor;
+        this.custom = custom;
+    }
+
+    public boolean isCustom() {
+        return this.custom;
     }
 
     /**
@@ -139,7 +145,11 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      * @since 0.14.15.6
      */
     public static RadarMode create(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction, int renderDotColor) {
-        return MODES.computeIfAbsent(id, nm -> new RadarMode(id, colorFunction, renderDotColor));
+        return MODES.computeIfAbsent(id, nm -> new RadarMode(id, colorFunction, renderDotColor, true));
+    }
+
+    static RadarMode createInternal(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction, int renderDotColor) {
+        return MODES.computeIfAbsent(id, nm -> new RadarMode(id, colorFunction, renderDotColor, false));
     }
 
     /**
@@ -152,6 +162,10 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      */
     public static RadarMode create(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction) {
         return create(id, colorFunction, 0xFFFF0000);
+    }
+
+    static RadarMode createInternal(ResourceLocation id, Function<PixelRenderData, Integer> colorFunction) {
+        return MODES.computeIfAbsent(id, nm -> new RadarMode(id, colorFunction, 0xFFFF0000, false));
     }
 
     /**

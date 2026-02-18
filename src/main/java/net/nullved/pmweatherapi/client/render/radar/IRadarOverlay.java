@@ -2,10 +2,10 @@ package net.nullved.pmweatherapi.client.render.radar;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -66,54 +66,8 @@ public interface IRadarOverlay {
             .setLight(cli);
     }
 
-    /**
-     * Render a texture at the given {@link ResourceLocation}
-     * @param texture The {@link ResourceLocation} of the texture
-     * @param radarRenderData The {@link RadarRenderData}
-     * @param poseStack The {@link PoseStack} to render with
-     * @param color The color
-     * @since 0.15.3.3
-     */
-    default void renderTexture(ResourceLocation texture, RadarRenderData radarRenderData, PoseStack poseStack, int color) {
-        PoseStack.Pose pose = poseStack.last();
-        //RenderType rt = RadarRenderTypes.createForTexture(texture);
-        VertexConsumer consumer = radarRenderData.multiBufferSource().getBuffer(RenderType.entityCutout(texture));
 
-        vertex(consumer, pose, color, -0.5f, -0.5f, 0, 0, 0, radarRenderData.combinedOverlayIn());
-        vertex(consumer, pose, color, 0.5f, -0.5f, 0, 1, 0, radarRenderData.combinedOverlayIn());
-        vertex(consumer, pose, color, 0.5f, 0.5f, 0, 1, 1, radarRenderData.combinedOverlayIn());
-        vertex(consumer, pose, color, -0.5f, 0.5f, 0, 0, 1, radarRenderData.combinedOverlayIn());
-
-//        consumer.addVertex(pose, -0.5f, -0.5f, 0.0f)
-//                .setColor(color)
-//                .setUv(0.0F, 0.0F)
-//                .setOverlay(renderData.combinedOverlayIn())
-//                .setLight(renderData.combinedLightIn())
-//                .setNormal(pose, 0.0f, 1.0f, 0.0f);
-//
-//        consumer.addVertex(pose, 0.5f, -0.5f, 0.0f)
-//                .setColor(color)
-//                .setUv(1.0F, 0.0F)
-//                .setOverlay(renderData.combinedOverlayIn())
-//                .setLight(renderData.combinedLightIn())
-//                .setNormal(pose, 0.0f, 1.0f, 0.0f);
-//
-//        consumer.addVertex(pose, 0.5f, 0.5f, 0.0f)
-//                .setColor(color)
-//                .setUv(1.0F, 1.0F)
-//                .setOverlay(renderData.combinedOverlayIn())
-//                .setLight(renderData.combinedLightIn())
-//                .setNormal(pose, 0.0f, 1.0f, 0.0f);
-//
-//        consumer.addVertex(pose, -0.5f, 0.5f, 0.0f)
-//                .setColor(color)
-//                .setUv(0.0F, 1.0F)
-//                .setOverlay(renderData.combinedOverlayIn())
-//                .setLight(renderData.combinedLightIn())
-//                .setNormal(pose, 0.0f, 1.0f, 0.0f);
-    }
-
-    default void vertex(VertexConsumer buffer, PoseStack.Pose pose, int color, float x, float y, float z, float u, float v, int overlay) {
+    default void texVertex(VertexConsumer buffer, PoseStack.Pose pose, int color, float x, float y, float z, float u, float v, int overlay) {
         buffer.addVertex(pose, x, y, z)
             .setColor(color)
             .setUv(u, v)
@@ -127,10 +81,60 @@ public interface IRadarOverlay {
      * @param texture The {@link ResourceLocation} of the texture
      * @param radarRenderData The {@link RadarRenderData}
      * @param poseStack The {@link PoseStack} to render with
+     * @param color The color
+     * @since 0.15.3.3
+     */
+    default void renderTexture(ResourceLocation texture, RadarRenderData radarRenderData, PoseStack poseStack, int color) {
+        PoseStack.Pose pose = poseStack.last();
+        VertexConsumer consumer = radarRenderData.multiBufferSource().getBuffer(RadarRenderTypes.doubleSided(texture));
+
+        texVertex(consumer, pose, color, -0.5f, -0.5f, 0, 0, 0, radarRenderData.combinedOverlayIn());
+        texVertex(consumer, pose, color, 0.5f, -0.5f, 0, 1, 0, radarRenderData.combinedOverlayIn());
+        texVertex(consumer, pose, color, 0.5f, 0.5f, 0, 1, 1, radarRenderData.combinedOverlayIn());
+        texVertex(consumer, pose, color, -0.5f, 0.5f, 0, 0, 1, radarRenderData.combinedOverlayIn());
+    }
+
+    /**
+     * Renders a texture from the given {@link ResourceLocation} facing upwards.
+     * Not guaranteed to work when other rotation transformations are present!
+     *
+     * @param texture The {@link ResourceLocation} of the texture
+     * @param radarRenderData The {@link RadarRenderData}
+     * @param poseStack The {@link PoseStack} to render with
+     * @param color The color
+     * @since 0.16.1.0-rc2
+     */
+    default void renderTextureUpwards(ResourceLocation texture, RadarRenderData radarRenderData, PoseStack poseStack, int color) {
+        orientUpwards(poseStack);
+        renderTexture(texture, radarRenderData, poseStack, color);
+        unorientUpwards(poseStack);
+    }
+
+    /**
+     * Render a texture at the given {@link ResourceLocation}
+     * @param texture The {@link ResourceLocation} of the texture
+     * @param radarRenderData The {@link RadarRenderData}
+     * @param poseStack The {@link PoseStack} to render with
      * @since 0.15.3.3
      */
     default void renderTexture(ResourceLocation texture, RadarRenderData radarRenderData, PoseStack poseStack) {
         renderTexture(texture, radarRenderData, poseStack, 0xFFFFFFFF);
+    }
+
+
+    /**
+     * Renders a texture from the given {@link ResourceLocation} facing upwards.
+     * Not guaranteed to work when other rotation transformations are present!
+     *
+     * @param texture The {@link ResourceLocation} of the texture
+     * @param radarRenderData The {@link RadarRenderData}
+     * @param poseStack The {@link PoseStack} to render with
+     * @since 0.16.1.0-rc2
+     */
+    default void renderTextureUpwards(ResourceLocation texture, RadarRenderData radarRenderData, PoseStack poseStack) {
+        orientUpwards(poseStack);
+        renderTexture(texture, radarRenderData, poseStack);
+        unorientUpwards(poseStack);
     }
 
     /**
@@ -144,6 +148,22 @@ public interface IRadarOverlay {
         renderTexture(texture, radarRenderData, radarRenderData.poseStack(), color);
     }
 
+
+    /**
+     * Renders a texture from the given {@link ResourceLocation} facing upwards.
+     * Not guaranteed to work when other rotation transformations are present!
+     *
+     * @param texture The {@link ResourceLocation} of the texture
+     * @param radarRenderData The {@link RadarRenderData}
+     * @param color The color
+     * @since 0.16.1.0-rc2
+     */
+    default void renderTextureUpwards(ResourceLocation texture, RadarRenderData radarRenderData, int color) {
+        orientUpwards(radarRenderData.poseStack());
+        renderTexture(texture, radarRenderData, color);
+        unorientUpwards(radarRenderData.poseStack());
+    }
+
     /**
      * Render a texture at the given {@link ResourceLocation}
      * @param texture The {@link ResourceLocation} of the texture
@@ -152,6 +172,21 @@ public interface IRadarOverlay {
      */
     default void renderTexture(ResourceLocation texture, RadarRenderData radarRenderData) {
         renderTexture(texture, radarRenderData, radarRenderData.poseStack(), 0xFFFFFFFF);
+    }
+
+
+    /**
+     * Renders a texture from the given {@link ResourceLocation} facing upwards.
+     * Not guaranteed to work when other rotation transformations are present!
+     *
+     * @param texture The {@link ResourceLocation} of the texture
+     * @param radarRenderData The {@link RadarRenderData}
+     * @since 0.16.1.0-rc2
+     */
+    default void renderTextureUpwards(ResourceLocation texture, RadarRenderData radarRenderData) {
+        orientUpwards(radarRenderData.poseStack());
+        renderTexture(texture, radarRenderData);
+        unorientUpwards(radarRenderData.poseStack());
     }
 
     /**
@@ -213,77 +248,220 @@ public interface IRadarOverlay {
         return ResourceLocation.fromNamespaceAndPath(getModID(), getIDPath());
     }
 
+    /* === UTILITY METHODS FOR POSES === */
 
-
-    default Vec3 worldToRadarCoords(Vec3 pos, BlockPos radarPos, int resolution, float simSize) {
-        return worldToRadarCoords(pos.x, pos.y, pos.z, radarPos, resolution, simSize);
+    /**
+     * Scales a pose by a uniform scale factor
+     *
+     * @param pose THe {@link PoseStack} to scale
+     * @param scaleFactor The scale factor
+     * @since 0.16.1.0-rc2
+     */
+    default void scale(PoseStack pose, float scaleFactor) {
+        pose.scale(scaleFactor, scaleFactor, scaleFactor);
     }
 
-    default Vec3 worldToRadarCoords(double x, double y, double z, BlockPos radarPos, int resolution, float simSize) {
-//        NearbyStorms.client().forStormNearBlock(pos, 2048, s -> renderMarker(renderData, s.position.add(-pos.getX(), -pos.getY(), -pos.getZ()), 0xFF008800));
-//        Vector3f radarPos = relative.add(0.5, 0.5, 0.5).toVector3f().mul(3 / (2 * resolution)).div(2048, 0, 2048).div(1.0F / resolution, 0.0F, 1.0F / resolution);
+    /**
+     * Transforms and scales a pose so that 1 block in world space == 1 pixel in radar space.
+     *
+     * @param poseStack The {@link PoseStack} to transform
+     * @param rrd The {@link RadarRenderData}
+     * @since 0.16.1.0-rc2
+     */
+    default void poseToRadarSpace(PoseStack poseStack, RadarRenderData rrd) {
+        float wtrRatio = (rrd.sizeRenderDiameter() / 2.0F) / rrd.simSize();
 
-//        Vector3f radarPos = relative.add(0.5, 0.5, 0.5).toVector3f().mul(3 / (2 * resolution)).div(2048, 0, 2048).div(1.0F / resolution, 0.0F, 1.0F / resolution);
-//        Vector3f topLeft = (new Vector3f(-1.0F, 0.0F, -1.0F)).mul(0.015F).add(radarPos.x, 0.005F, radarPos.z);
-//        Vector3f bottomLeft = (new Vector3f(-1.0F, 0.0F, 1.0F)).mul(0.015F).add(radarPos.x, 0.005F, radarPos.z);
-//        Vector3f bottomRight = (new Vector3f(1.0F, 0.0F, 1.0F)).mul(0.015F).add(radarPos.x, 0.005F, radarPos.z);
-//        Vector3f topRight = (new Vector3f(1.0F, 0.0F, -1.0F)).mul(0.015F).add(radarPos.x, 0.005F, radarPos.z);
-
-        double resolutionScaleFactor = 3D / (2 * resolution);
-        double invSize = 1D / simSize;
-
-        double dx = x - radarPos.getX();
-        double dy = y - radarPos.getY();
-        double dz = z - radarPos.getZ();
-
-        Vec3 radarCoords = new Vec3(dx, dy, dz);
-        radarCoords.add(0.5, 0.5, 0.5)
-                .multiply(resolutionScaleFactor, resolutionScaleFactor, resolutionScaleFactor)
-                .multiply(invSize, invSize, invSize);
-
-        return radarCoords;
+        poseStack.translate(0, 0.055f, 0);
+        poseStack.scale(wtrRatio, 1, wtrRatio);
+        poseStack.translate(-rrd.radarX() - 0.5f, 0f, -rrd.radarZ() - 0.5f);
     }
 
-    default Vec3 radarToWorldCoords(Vec3 pos, BlockPos radarPos, int resolution, float simSize) {
-        return radarToWorldCoords(pos.x, pos.y, pos.z, radarPos, resolution, simSize);
+    /**
+     * Goes to the given {@link Vec3} relative to the radar's position.
+     * Uses {@link #poseToRadarSpace(PoseStack, RadarRenderData)} and {@link #poseToWorldSpace(PoseStack, RadarRenderData)}
+     *
+     * @param location The {@link Vec3} of the absolute location
+     * @param poseStack The {@link PoseStack}
+     * @param rrd The {@link RadarRenderData}
+     * @since 0.16.1.0-rc2
+     */
+    default void placeOnRadar(Vec3 location, PoseStack poseStack, RadarRenderData rrd) {
+        poseToRadarSpace(poseStack, rrd);
+        poseStack.translate(location.x, 0, location.z);
+        poseToWorldSpace(poseStack, rrd);
     }
 
-    default Vec3 radarToWorldCoords(double x, double y, double z, BlockPos radarPos, int resolution, float simSize) {
-        double resolutionScaleFactor = (2 * resolution) / 3D;
-        double invResolution = 1D / resolution;
-
-        double dx = x + radarPos.getX();
-        double dy = y + radarPos.getY();
-        double dz = z + radarPos.getZ();
-
-        Vec3 worldCoords = new Vec3(dx, dy, dz);
-        worldCoords.add(-0.5, -0.5, -0.5)
-                .multiply(resolutionScaleFactor, resolutionScaleFactor, resolutionScaleFactor)
-                .multiply(simSize, simSize, simSize);
-
-        return worldCoords;
+    /**
+     * Orients a {@link PoseStack} to face upwards.
+     * May not work if other rotations are present!
+     *
+     * @param poseStack The {@link PoseStack} to orient upwards
+     * @since 0.16.1.0-rc2
+     */
+    default void orientUpwards(PoseStack poseStack) {
+        poseStack.mulPose(Axis.XN.rotationDegrees(90));
     }
 
-    default Vec3 worldToRadarCoordsExp(Vec3 pos, BlockPos radarPos, float sizeRenderDiameter, float simSize) {
-        double wtrRatio = (sizeRenderDiameter / 2.0f) / simSize;
+    /**
+     * Unorients a {@link PoseStack} that is facing upwards.
+     * May not work if other rotations are present!
+     *
+     * @param poseStack The {@link PoseStack} to unorient
+     * @since 0.16.1.0-rc2
+     */
+    default void unorientUpwards(PoseStack poseStack) {
+        poseStack.mulPose(Axis.XP.rotationDegrees(90));
+    }
+
+    /**
+     * Flips a {@link PoseStack} on the specified {@link Axis}.
+     *
+     * @param poseStack The {@link PoseStack} to flip
+     * @param axis The {@link Axis} to flip around
+     * @since 0.16.1.0-rc2
+     */
+    default void flipPose(PoseStack poseStack, Axis axis) {
+        poseStack.mulPose(axis.rotationDegrees(180));
+    }
+
+    /**
+     * Translates a {@link Vec3} of absolute coordinates to a {@link Vec3} of radar coordinates
+     *
+     * @param pos The {@link Vec3} of absolute coordinates
+     * @param rrd The {@link RadarRenderData}
+     * @return The {@link Vec3} of radar coordinates
+     * @since 0.16.1.0-rc2
+     */
+    default Vec3 worldToRadarCoords(Vec3 pos, RadarRenderData rrd) {
+        return worldToRadarCoords(pos, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
+    }
+
+
+    /**
+     * Translates a {@link Vec3} of absolute coordinates to a {@link Vec3} of radar coordinates
+     *
+     * @param pos The {@link Vec3} of absolute coordinates
+     * @param radarPos The {@link BlockPos} of the radar
+     * @param sizeRenderDiameter The diameter of the radar size. Is 3 for small radars and 6 for big (unless 3x3 option is on)
+     * @param simSize The simulation size of the radar. Is 2048 for small radars and 8192 for big radars
+     * @return The {@link Vec3} of radar coordinates
+     * @since 0.16.1.0-rc2
+     */
+    default Vec3 worldToRadarCoords(Vec3 pos, BlockPos radarPos, float sizeRenderDiameter, float simSize) {
+        return worldToRadarCoords(pos.x, pos.z, radarPos, sizeRenderDiameter, simSize);
+    }
+
+
+    /**
+     * Translates absolute coordinates to a {@link Vec3} of radar coordinates
+     *
+     * @param x The x-coordinate of the absolute position
+     * @param z The z-coordinate of the absolute position
+     * @param rrd The {@link RadarRenderData}
+     * @return The {@link Vec3} of radar coordinates
+     * @since 0.16.1.0-rc2
+     */
+    default Vec3 worldToRadarCoords(double x, double z, RadarRenderData rrd) {
+        return worldToRadarCoords(x, z, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
+    }
+
+
+    /**
+     * Translates a {@link Vec3} of absolute coordinates to a {@link Vec3} of radar coordinates
+     *
+     * @param x The x-coordinate of the absolute position
+     * @param z The z-coordinate of the absolute position
+     * @param sizeRenderDiameter The diameter of the radar size. Is 3 for small radars and 6 for big (unless 3x3 option is on)
+     * @param simSize The simulation size of the radar. Is 2048 for small radars and 8192 for big radars
+     * @return The {@link Vec3} of radar coordinates
+     * @since 0.16.1.0-rc2
+     */
+    default Vec3 worldToRadarCoords(double x, double z, BlockPos radarPos, float sizeRenderDiameter, float simSize) {
+        double wtrRatio = (sizeRenderDiameter / 2.0F) / simSize;
 
         double centerX = radarPos.getX() + 0.5D;
         double centerZ = radarPos.getZ() + 0.5D;
 
-        double dx = pos.x - centerX;
-        double dz = pos.z - centerZ;
+        double dx = x - centerX;
+        double dz = z - centerZ;
 
         return new Vec3(dx * wtrRatio, 0, dz * wtrRatio);
     }
 
-    default Vec3 radarToWorldCoordsExp(Vec3 pos, BlockPos radarPos, float sizeRenderDiameter, float simSize) {
+    /**
+     * Untransforms and scales a pose where 1 block in world space == 1 pixel in radar space.
+     *
+     * @param poseStack The {@link PoseStack} to transform
+     * @param rrd The {@link RadarRenderData}
+     * @since 0.16.1.0-rc2
+     */
+    default void poseToWorldSpace(PoseStack poseStack, RadarRenderData rrd) {
+        float rtwRatio =  rrd.simSize() / (rrd.sizeRenderDiameter() / 2.0F);
+
+        poseStack.translate(rrd.radarX() + 0.5f, 0.0f, rrd.radarZ() + 0.5f);
+        poseStack.scale(rtwRatio, 1, rtwRatio);
+        poseStack.translate(0, -0.05f, 0);
+    }
+
+
+    /**
+     * Translates a {@link Vec3} of radar coordinates to a {@link Vec3} of absolute coordinates
+     *
+     * @param pos The {@link Vec3} of radar coordinates
+     * @param rrd The {@link RadarRenderData}
+     * @return The {@link Vec3} of radar coordinates
+     * @since 0.16.1.0-rc2
+     */
+    default Vec3 radarToWorldCoords(Vec3 pos, RadarRenderData rrd) {
+        return worldToRadarCoords(pos, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
+    }
+
+
+    /**
+     * Translates a {@link Vec3} of radar coordinates to a {@link Vec3} of absolute coordinates
+     *
+     * @param pos The {@link Vec3} of radar coordinates
+     * @param sizeRenderDiameter The diameter of the radar size. Is 3 for small radars and 6 for big (unless 3x3 option is on)
+     * @param simSize The simulation size of the radar. Is 2048 for small radars and 8192 for big radars
+     * @return The {@link Vec3} of radar coordinates
+     * @since 0.16.1.0-rc2
+     */
+    default Vec3 radarToWorldCoords(Vec3 pos, BlockPos radarPos, float sizeRenderDiameter, float simSize) {
+        return worldToRadarCoords(pos.x, pos.z, radarPos, sizeRenderDiameter, simSize);
+    }
+
+
+    /**
+     * Translates a {@link Vec3} of radar coordinates to a {@link Vec3} of absolute coordinates
+     *
+     * @param x The x-coordinate of the radar position
+     * @param z The z-coordinate of the radar position
+     * @param rrd The {@link RadarRenderData}
+     * @return The {@link Vec3} of radar coordinates
+     * @since 0.16.1.0-rc2
+     */
+    default Vec3 radarToWorldCoords(double x, double z, RadarRenderData rrd) {
+        return worldToRadarCoords(x, z, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
+    }
+
+    /**
+     * Translates a {@link Vec3} of radar coordinates to a {@link Vec3} of absolute coordinates
+     *
+     * @param x The x-coordinate of the radar position
+     * @param z The z-coordinate of the radar position
+     * @param sizeRenderDiameter The diameter of the radar size. Is 3 for small radars and 6 for big (unless 3x3 option is on)
+     * @param simSize The simulation size of the radar. Is 2048 for small radars and 8192 for big radars
+     * @return The {@link Vec3} of radar coordinates
+     * @since 0.16.1.0-rc2
+     */
+    default Vec3 radarToWorldCoords(double x, double z, BlockPos radarPos, float sizeRenderDiameter, float simSize) {
         double rtwRatio = simSize / (sizeRenderDiameter / 2.0);
 
         double centerX = radarPos.getX() + 0.5D;
         double centerZ = radarPos.getZ() + 0.5D;
 
-        double worldX = centerX + (pos.x * rtwRatio);
-        double worldZ = centerZ + (pos.z * rtwRatio);
+        double worldX = centerX + (x * rtwRatio);
+        double worldZ = centerZ + (z * rtwRatio);
 
         return new Vec3(worldX, radarPos.getY(), worldZ);
     }

@@ -21,7 +21,6 @@ import net.nullved.pmweatherapi.client.render.IDOverlay;
 import net.nullved.pmweatherapi.client.render.radar.RadarOverlays;
 import net.nullved.pmweatherapi.config.PMWClientConfig;
 import net.nullved.pmweatherapi.data.PMWStorages;
-import net.nullved.pmweatherapi.example.ExampleOverlay;
 import net.nullved.pmweatherapi.metar.MetarServerStorage;
 import net.nullved.pmweatherapi.metar.MetarStorage;
 import net.nullved.pmweatherapi.metar.MetarStorageData;
@@ -86,14 +85,12 @@ public class PMWeatherAPI {
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
-        //RadarMode.removeBaseRendering(true);
-
         PMWClientStorages.registerStorage(RadarStorage.ID, RadarClientStorage.class, RadarClientStorage::new);
         PMWClientStorages.registerStorage(MetarStorage.ID, MetarClientStorage.class, MetarClientStorage::new);
         PMWClientStorages.registerStorage(WSRStorage.ID, WSRClientStorage.class, WSRClientStorage::new);
 
-        RadarOverlays.registerOverlay(() -> IDOverlay.INSTANCE);
-//        RadarOverlays.registerOverlay(() -> ExampleOverlay.INSTANCE);
+        RadarOverlays.registerOverlay(IDOverlay.INSTANCE);
+//        RadarOverlays.registerOverlay(ExampleOverlay.INSTANCE);
     }
     public static ResourceLocation rl(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
