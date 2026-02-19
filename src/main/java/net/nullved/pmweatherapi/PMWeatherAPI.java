@@ -6,7 +6,6 @@ import dev.protomanly.pmweather.addons.AddonInfo;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -30,11 +29,8 @@ import net.nullved.pmweatherapi.network.PMWNetworking;
 import net.nullved.pmweatherapi.radar.storage.*;
 import net.nullved.pmweatherapi.storage.data.BlockPosData;
 import net.nullved.pmweatherapi.storage.data.StorageDataManager;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Mod(PMWeatherAPI.MODID)
@@ -49,29 +45,11 @@ public class PMWeatherAPI {
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::registerPayloads);
 
-        AddonHelper.registerAddon(new AddonInfo(modContainer, new ArrayList<>(){{
-            add("0.16");
-        }}));
+        AddonHelper.registerAddon(new AddonInfo(modContainer, List.of("0.16.2")));
 
         LOGGER.info("Initialized PMWAPI");
 
-        if (ModList.get().isLoaded("pmweather")) {
-            ModContainer pmweather = ModList.get().getModContainerById("pmweather").get();
-
-            ArtifactVersion pmweatherVer = pmweather.getModInfo().getVersion();
-            String pmweatherVerS = pmweatherVer.getMajorVersion() + "." + pmweatherVer.getMinorVersion() + "." + pmweatherVer.getIncrementalVersion();
-            String pmweatherExpected = "0.16.1-1.21.1-alpha";
-            int pmweatherCompared = pmweatherVer.compareTo(new DefaultArtifactVersion(pmweatherExpected));
-
-            if (pmweatherCompared == 0) {
-                PMWeatherAPI.LOGGER.info("Found PMWeather Version {}", pmweatherExpected.split("-")[0]);
-            } else if (pmweatherCompared > 0) {
-                PMWeatherAPI.LOGGER.warn("Found newer PMWeather Version {} than supported ({})! Support is NOT guaranteed!", pmweatherVerS, pmweatherExpected.split("-")[0]);
-            } else {
-                PMWeatherAPI.LOGGER.info("Found old PMWeather Version {}! Please update PMWeather to version {}!", pmweatherVerS, pmweatherExpected.split("-")[0]);
-            }
-        }
-
+        LOGGER.info("Registering PMWAPI Config");
         if (FMLEnvironment.dist.isClient()) {
             modContainer.registerConfig(ModConfig.Type.CLIENT, PMWClientConfig.SPEC);
             modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
@@ -79,25 +57,31 @@ public class PMWeatherAPI {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
+        LOGGER.info("Registering PMWAPI Storage Data...");
         StorageDataManager.register(BlockPosData.ID, BlockPosData::deserializeFromNBT);
         StorageDataManager.register(RadarStorageData.ID, RadarStorageData::deserializeFromNBT);
         StorageDataManager.register(MetarStorageData.ID, MetarStorageData::deserializeFromNBT);
         StorageDataManager.register(WSRStorageData.ID, WSRStorageData::deserializeFromNBT);
 
+        LOGGER.info("Registering PMWAPI Storages [Common]...");
         PMWStorages.registerStorage(RadarStorage.ID, RadarServerStorage.class, RadarServerStorage::new);
         PMWStorages.registerStorage(MetarStorage.ID, MetarServerStorage.class, MetarServerStorage::new);
         PMWStorages.registerStorage(WSRStorage.ID, WSRServerStorage.class, WSRServerStorage::new);
     }
 
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
+        LOGGER.info("Registering PMWAPI Network Payloads...");
+
         PMWNetworking.register(event.registrar("1"));
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
+        LOGGER.info("Registering PMWAPI Storages [Client]...");
         PMWClientStorages.registerStorage(RadarStorage.ID, RadarClientStorage.class, RadarClientStorage::new);
         PMWClientStorages.registerStorage(MetarStorage.ID, MetarClientStorage.class, MetarClientStorage::new);
         PMWClientStorages.registerStorage(WSRStorage.ID, WSRClientStorage.class, WSRClientStorage::new);
 
+        LOGGER.info("Registering PMWAPI Radar Overlays...");
         RadarOverlays.registerOverlay(IDOverlay.INSTANCE);
 //        RadarOverlays.registerOverlay(ExampleOverlay.INSTANCE);
     }

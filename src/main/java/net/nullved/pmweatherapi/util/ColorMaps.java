@@ -43,16 +43,16 @@ public class ColorMaps {
      * A {@link ColorMap} equivalent to {@link ColorTables#getMixedReflectivity(float)}
      * @since 0.16.0.0
      */
-    public static final ColorMap MIXED_REFLECTIVITY = ColorMap.Builder.of(0x00FFFFFF)
-        .override(0x00FFFFFF, 0.0F)
+    public static final ColorMap MIXED_REFLECTIVITY = ColorMap.Builder.of(0xFFFFFFFF)
+        .override(0xFFFFFFF, 0.0F)
         .build(0xFF006FFF, 70.0F);
 
     /**
      * A {@link ColorMap} equivalent to {@link ColorTables#getSnowReflectivity(float)}
      * @since 0.16.0.0
      */
-    public static final ColorMap SNOW_REFLECTIVITY = ColorMap.Builder.of(0x00FAC3F8)
-        .override(0x00FAC3F8, 0.0F)
+    public static final ColorMap SNOW_REFLECTIVITY = ColorMap.Builder.of(0xFFFAC3F8)
+        .override(0xFFFAC3F8, 0.0F)
         .build(0xFFD200D2, 70.0F);
 
     /**

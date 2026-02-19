@@ -16,19 +16,17 @@ public class RadarRenderTypes {
     private static final HashMap<ResourceLocation, RenderType> OVERLAY_CACHE = new HashMap<>();
     public static final RenderType RADAR = RenderType.create(
             "radar",
-            DefaultVertexFormat.POSITION_COLOR_LIGHTMAP,
+            DefaultVertexFormat.POSITION_COLOR,
             VertexFormat.Mode.QUADS,
             256,
             false,
             false,
             RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.POSITION_COLOR_LIGHTMAP_SHADER)
+                    .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
                     .setTransparencyState(NO_TRANSPARENCY)
                     .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
-                    .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)
                     .setCullState(RenderStateShard.NO_CULL)
-                    .setLightmapState(LIGHTMAP)
-                    .setOverlayState(RenderStateShard.NO_OVERLAY)
                     .createCompositeState(false)
     );
 

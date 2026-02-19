@@ -67,7 +67,7 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
             : ColorMaps.REFLECTIVITY.get(prd.rdbz());
 
         if (prd.rdbz() > 5.0F && !prd.radarRenderData().blockEntity().hasRangeUpgrade) {
-            if (prd.temp() < 3.0F && prd.temp() > 1.0F) color = ColorMaps.MIXED_REFLECTIVITY.get(prd.rdbz());
+            if (prd.temp() < 3.0F && prd.temp() > -1.0F) color = ColorMaps.MIXED_REFLECTIVITY.get(prd.rdbz());
             else if (prd.temp() <= -1.0F) color = ColorMaps.SNOW_REFLECTIVITY.get(prd.rdbz());
         }
 
