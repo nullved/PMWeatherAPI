@@ -262,36 +262,6 @@ public interface IRadarOverlay {
     }
 
     /**
-     * Transforms and scales a pose so that 1 block in world space == 1 pixel in radar space.
-     *
-     * @param poseStack The {@link PoseStack} to transform
-     * @param rrd The {@link RadarRenderData}
-     * @since 0.16.1.0-rc2
-     */
-    default void poseToRadarSpace(PoseStack poseStack, RadarRenderData rrd) {
-        float wtrRatio = (rrd.sizeRenderDiameter() / 2.0F) / rrd.simSize();
-
-        poseStack.translate(0, 0.055f, 0);
-        poseStack.scale(wtrRatio, 1, wtrRatio);
-        poseStack.translate(-rrd.radarX() - 0.5f, 0f, -rrd.radarZ() - 0.5f);
-    }
-
-    /**
-     * Goes to the given {@link Vec3} relative to the radar's position.
-     * Uses {@link #poseToRadarSpace(PoseStack, RadarRenderData)} and {@link #poseToWorldSpace(PoseStack, RadarRenderData)}
-     *
-     * @param location The {@link Vec3} of the absolute location
-     * @param poseStack The {@link PoseStack}
-     * @param rrd The {@link RadarRenderData}
-     * @since 0.16.1.0-rc2
-     */
-    default void placeOnRadar(Vec3 location, PoseStack poseStack, RadarRenderData rrd) {
-        poseToRadarSpace(poseStack, rrd);
-        poseStack.translate(location.x, 0, location.z);
-        poseToWorldSpace(poseStack, rrd);
-    }
-
-    /**
      * Orients a {@link PoseStack} to face upwards.
      * May not work if other rotations are present!
      *
@@ -325,6 +295,42 @@ public interface IRadarOverlay {
     }
 
     /**
+     * Goes to the given {@link Vec3} relative to the radar's position.
+     * Uses {@link #poseToRadarSpace(PoseStack, RadarRenderData)} and {@link #poseToWorldSpace(PoseStack, RadarRenderData)}
+     *
+     * @param location The {@link Vec3} of the absolute location
+     * @param poseStack The {@link PoseStack}
+     * @param rrd The {@link RadarRenderData}
+     * @since 0.16.1.0-rc2
+     */
+    default void placeOnRadar(Vec3 location, PoseStack poseStack, RadarRenderData rrd) {
+        double dx = location.x - (rrd.radarX() + 0.5D);
+        double dz = location.z - (rrd.radarZ() + 0.5D);
+
+        float ratio = (rrd.sizeRenderDiameter() / 2.0F) / rrd.simSize();
+        poseStack.translate(dx * ratio, 0.01f, dz * ratio);
+//
+//        poseToRadarSpace(poseStack, rrd);
+//        poseStack.translate(location.x, 0, location.z);
+//        poseToWorldSpace(poseStack, rrd);
+    }
+
+    /**
+     * Transforms and scales a pose so that 1 block in world space == 1 pixel in radar space.
+     *
+     * @param poseStack The {@link PoseStack} to transform
+     * @param rrd The {@link RadarRenderData}
+     * @since 0.16.1.0-rc2
+     */
+    default void poseToRadarSpace(PoseStack poseStack, RadarRenderData rrd) {
+        float wtrRatio = (rrd.sizeRenderDiameter() / 2.0F) / rrd.simSize();
+
+        poseStack.translate(0, 0.055f, 0);
+        poseStack.scale(wtrRatio, 1, wtrRatio);
+        poseStack.translate(-rrd.radarX() - 0.5f, 0f, -rrd.radarZ() - 0.5f);
+    }
+
+    /**
      * Translates a {@link Vec3} of absolute coordinates to a {@link Vec3} of radar coordinates
      *
      * @param pos The {@link Vec3} of absolute coordinates
@@ -335,7 +341,6 @@ public interface IRadarOverlay {
     default Vec3 worldToRadarCoords(Vec3 pos, RadarRenderData rrd) {
         return worldToRadarCoords(pos, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
     }
-
 
     /**
      * Translates a {@link Vec3} of absolute coordinates to a {@link Vec3} of radar coordinates
@@ -351,7 +356,6 @@ public interface IRadarOverlay {
         return worldToRadarCoords(pos.x, pos.z, radarPos, sizeRenderDiameter, simSize);
     }
 
-
     /**
      * Translates absolute coordinates to a {@link Vec3} of radar coordinates
      *
@@ -364,7 +368,6 @@ public interface IRadarOverlay {
     default Vec3 worldToRadarCoords(double x, double z, RadarRenderData rrd) {
         return worldToRadarCoords(x, z, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
     }
-
 
     /**
      * Translates a {@link Vec3} of absolute coordinates to a {@link Vec3} of radar coordinates
@@ -403,7 +406,6 @@ public interface IRadarOverlay {
         poseStack.translate(0, -0.05f, 0);
     }
 
-
     /**
      * Translates a {@link Vec3} of radar coordinates to a {@link Vec3} of absolute coordinates
      *
@@ -413,9 +415,8 @@ public interface IRadarOverlay {
      * @since 0.16.1.0-rc2
      */
     default Vec3 radarToWorldCoords(Vec3 pos, RadarRenderData rrd) {
-        return worldToRadarCoords(pos, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
+        return radarToWorldCoords(pos, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
     }
-
 
     /**
      * Translates a {@link Vec3} of radar coordinates to a {@link Vec3} of absolute coordinates
@@ -427,9 +428,8 @@ public interface IRadarOverlay {
      * @since 0.16.1.0-rc2
      */
     default Vec3 radarToWorldCoords(Vec3 pos, BlockPos radarPos, float sizeRenderDiameter, float simSize) {
-        return worldToRadarCoords(pos.x, pos.z, radarPos, sizeRenderDiameter, simSize);
+        return radarToWorldCoords(pos.x, pos.z, radarPos, sizeRenderDiameter, simSize);
     }
-
 
     /**
      * Translates a {@link Vec3} of radar coordinates to a {@link Vec3} of absolute coordinates
@@ -441,7 +441,7 @@ public interface IRadarOverlay {
      * @since 0.16.1.0-rc2
      */
     default Vec3 radarToWorldCoords(double x, double z, RadarRenderData rrd) {
-        return worldToRadarCoords(x, z, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
+        return radarToWorldCoords(x, z, rrd.blockEntity().getBlockPos(), rrd.sizeRenderDiameter(), rrd.simSize());
     }
 
     /**
@@ -457,8 +457,8 @@ public interface IRadarOverlay {
     default Vec3 radarToWorldCoords(double x, double z, BlockPos radarPos, float sizeRenderDiameter, float simSize) {
         double rtwRatio = simSize / (sizeRenderDiameter / 2.0);
 
-        double centerX = radarPos.getX() + 0.5D;
-        double centerZ = radarPos.getZ() + 0.5D;
+        double centerX = radarPos.getX();
+        double centerZ = radarPos.getZ();
 
         double worldX = centerX + (x * rtwRatio);
         double worldZ = centerZ + (z * rtwRatio);

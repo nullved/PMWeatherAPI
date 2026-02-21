@@ -45,7 +45,7 @@ public class PMWeatherAPI {
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::registerPayloads);
 
-        AddonHelper.registerAddon(new AddonInfo(modContainer, List.of("0.16.3")));
+        AddonHelper.registerAddon(new AddonInfo(modContainer, List.of("0.16.4", "0.16.5")));
 
         LOGGER.info("Initialized PMWAPI");
 
