@@ -99,7 +99,7 @@ public class RadarRendererMixin {
 //        RenderSystem.defaultBlendFunc();
 
         poseStack.pushPose();
-        poseStack.translate(0.5F, 1.05F, 0.5F);
+        poseStack.translate(0.5F, 1 + (PMWClientConfig.lowerRadar ? 0.01f : 0.05f), 0.5F);
 
         // PMWeatherAPI: Switch to using a VertexConsumer over a BufferBuilder
         VertexConsumer vc = multiBufferSource.getBuffer(RadarRenderTypes.RADAR);

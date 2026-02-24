@@ -60,9 +60,8 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      */
     public static final RadarMode REFLECTIVITY = createInternal(PMWeather.getPath("reflectivity"), prd -> {
         Holder<Biome> biome = prd.radarRenderData().blockEntity().getNearestBiome(new BlockPos((int) prd.wx(), prd.radarRenderData().blockEntity().getBlockPos().getY(), (int) prd.wz()));
-//        if (prd.rdbz() < 5.0f && PMWClientConfig.transparentBackground) return 0x00000000;
 
-        int color = biome != null
+        int color = (biome != null && !PMWClientConfig.transparentBackground)
             ? ColorMaps.REFLECTIVITY.getWithBiome(prd.rdbz(), biome, prd.x(), prd.z())
             : ColorMaps.REFLECTIVITY.get(prd.rdbz());
 
@@ -71,7 +70,9 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
             else if (prd.temp() <= -1.0F) color = ColorMaps.SNOW_REFLECTIVITY.get(prd.rdbz());
         }
 
-        return color;
+        return PMWClientConfig.transparentBackground
+            ? ColorMap.lerp(Math.clamp((prd.rdbz() - 5.0F) / 5.0F, 0, 1), color & 0x00FFFFFF, color)
+            : 0xFF000000 | color;
     });
 
     /**
@@ -80,8 +81,15 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      */
     public static final RadarMode VELOCITY = createInternal(PMWeather.getPath("velocity"), prd -> {
         int velCol = prd.velocity() >= 0.0F ? ColorMaps.POSITIVE_VELOCITY.get(prd.velocity() / 1.75F) : ColorMaps.NEGATIVE_VELOCITY.get(-prd.velocity() / 1.75F);
+//        if (Math.abs(prd.velocity()) < 3.0F && PMWClientConfig.transparentBackground) return 0x00000000;
 
-        return ColorMap.lerp(Mth.clamp(Math.max(prd.rdbz(), (Mth.abs(prd.velocity() / 1.75F) - 18.0F) / 0.65F) / 12.0F, 0.0F, 1.0F), 0xFF000000, velCol);
+        float visibilityFactor = Mth.clamp(
+            Math.max(prd.rdbz(), (Math.abs(prd.velocity() / 1.75F) - 18.0F) / 0.65F) / 12.0F,
+            0.0F,
+            1.0F
+        );
+
+        return ColorMap.lerp(visibilityFactor, PMWClientConfig.transparentBackground ? velCol & 0x00FFFFFF : 0xFF000000, velCol);
     });
 
     /**
@@ -90,6 +98,7 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
      */
     public static final RadarMode IR = createInternal(PMWeather.getPath("ir"), prd -> {
         float rdbz = prd.rdbz();
+        if (prd.rdbz() < 3.0F && PMWClientConfig.transparentBackground) return 0x00000000;
         float ir = rdbz * 10.0F;
 
         if (rdbz > 10.0F) {
@@ -100,7 +109,10 @@ public class RadarMode implements StringRepresentable, Comparable<RadarMode> {
             ir += (rdbz - 50.0F) * 5.0F;
         }
 
-        return ColorMaps.IR.get(ir);
+        int color = ColorMaps.IR.get(ir);
+        return PMWClientConfig.transparentBackground
+            ? ColorMap.lerp(Math.clamp((rdbz - 5.0F) / 5.0F, 0, 1), color & 0x00FFFFFF, color)
+            : 0xFF000000 | color;
     });
 
     private final ResourceLocation id;

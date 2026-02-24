@@ -23,7 +23,7 @@ public class RadarRenderTypes {
             false,
             RenderType.CompositeState.builder()
                     .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
-                    .setTransparencyState(NO_TRANSPARENCY)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setDepthTestState(RenderStateShard.LEQUAL_DEPTH_TEST)
                     .setWriteMaskState(COLOR_DEPTH_WRITE)
                     .setCullState(RenderStateShard.NO_CULL)

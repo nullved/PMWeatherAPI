@@ -80,10 +80,6 @@ public class PMWeatherAPI {
         PMWClientStorages.registerStorage(RadarStorage.ID, RadarClientStorage.class, RadarClientStorage::new);
         PMWClientStorages.registerStorage(MetarStorage.ID, MetarClientStorage.class, MetarClientStorage::new);
         PMWClientStorages.registerStorage(WSRStorage.ID, WSRClientStorage.class, WSRClientStorage::new);
-
-        LOGGER.info("Registering PMWAPI Radar Overlays...");
-        RadarOverlays.registerOverlay(IDOverlay.INSTANCE);
-//        RadarOverlays.registerOverlay(ExampleOverlay.INSTANCE);
     }
     public static ResourceLocation rl(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);

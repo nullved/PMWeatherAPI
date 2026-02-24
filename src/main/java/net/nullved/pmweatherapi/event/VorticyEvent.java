@@ -1,6 +1,8 @@
 package net.nullved.pmweatherapi.event;
 
 import dev.protomanly.pmweather.weather.Vorticy;
+import dev.protomanly.pmweather.weather.WeatherHandler;
+import dev.protomanly.pmweather.weather.WeatherHandlerClient;
 import net.neoforged.bus.api.Event;
 
 /**
@@ -11,13 +13,23 @@ import net.neoforged.bus.api.Event;
  */
 public abstract class VorticyEvent extends Event {
     private final Vorticy vorticy;
+    private final WeatherHandler weatherHandler;
 
-    public VorticyEvent(Vorticy vorticy) {
+    public VorticyEvent(Vorticy vorticy, WeatherHandler weatherHandler) {
         this.vorticy = vorticy;
+        this.weatherHandler = weatherHandler;
     }
 
     public Vorticy getVorticy() {
         return vorticy;
+    }
+
+    public WeatherHandler getWeatherHandler() {
+        return weatherHandler;
+    }
+
+    public boolean isClientSide() {
+        return weatherHandler instanceof WeatherHandlerClient;
     }
 
     /**
@@ -25,8 +37,8 @@ public abstract class VorticyEvent extends Event {
      * @since 0.14.15.4
      */
     public static class New extends VorticyEvent {
-        public New(Vorticy vorticy) {
-            super(vorticy);
+        public New(Vorticy vorticy, WeatherHandler weatherHandler) {
+            super(vorticy, weatherHandler);
         }
     }
 
@@ -35,8 +47,8 @@ public abstract class VorticyEvent extends Event {
      * @since 0.14.15.4
      */
     public static class Dead extends VorticyEvent {
-        public Dead(Vorticy vorticy) {
-            super(vorticy);
+        public Dead(Vorticy vorticy, WeatherHandler weatherHandler) {
+            super(vorticy, weatherHandler);
         }
     }
 }

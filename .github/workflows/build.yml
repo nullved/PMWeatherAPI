@@ -41,7 +41,10 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: pmweatherapi
-        path: build/libs/*[!-javadoc][!-sources].jar
+        path: |
+          build/libs/*.jar
+          !build/libs/*-sources.jar
+          !build/libs/*-javadoc.jar
         
     - name: Upload sources
       uses: actions/upload-artifact@v4

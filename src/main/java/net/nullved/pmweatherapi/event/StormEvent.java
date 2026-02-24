@@ -1,6 +1,8 @@
 package net.nullved.pmweatherapi.event;
 
 import dev.protomanly.pmweather.weather.Storm;
+import dev.protomanly.pmweather.weather.WeatherHandlerClient;
+import dev.protomanly.pmweather.weather.storms.StormType;
 import net.neoforged.bus.api.Event;
 
 /**
@@ -26,42 +28,20 @@ public abstract class StormEvent extends Event {
         return storm.ID;
     }
 
+    public StormType getStormType() {
+        return storm.stormType;
+    }
+
+    public boolean isClientSide() {
+        return storm.weatherHandler instanceof WeatherHandlerClient;
+    }
+
     /**
      * Called when a new {@link Storm} is created
      * @since 0.14.15.4
      */
     public static class New extends StormEvent {
         public New(Storm storm) {
-            super(storm);
-        }
-    }
-
-    /**
-     * Called when a new supercell {@link Storm} is created
-     * @since 0.15.3.3
-     */
-    public static class NewSupercell extends StormEvent {
-        public NewSupercell(Storm storm) {
-            super(storm);
-        }
-    }
-
-    /**
-     * Called when a new squall {@link Storm} is created
-     * @since 0.15.3.3
-     */
-    public static class NewSquall extends StormEvent {
-        public NewSquall(Storm storm) {
-            super(storm);
-        }
-    }
-
-    /**
-     * Called when a new cyclone {@link Storm} is created
-     * @since 0.15.3.3
-     */
-    public static class NewCyclone extends StormEvent {
-        public NewCyclone(Storm storm) {
             super(storm);
         }
     }

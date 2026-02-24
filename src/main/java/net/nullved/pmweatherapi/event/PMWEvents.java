@@ -1,10 +1,7 @@
 package net.nullved.pmweatherapi.event;
 
 import dev.protomanly.pmweather.event.GameBusEvents;
-import dev.protomanly.pmweather.weather.Sounding;
-import dev.protomanly.pmweather.weather.ThermodynamicEngine;
-import dev.protomanly.pmweather.weather.WeatherHandler;
-import dev.protomanly.pmweather.weather.WindEngine;
+import dev.protomanly.pmweather.weather.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +24,7 @@ import net.nullved.pmweatherapi.storage.ISyncServerStorage;
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = PMWeatherAPI.MODID)
+@EventBusSubscriber(modid = PMWeatherAPI.MODID)
 public class PMWEvents {
     private static int ticks = 0;
 
