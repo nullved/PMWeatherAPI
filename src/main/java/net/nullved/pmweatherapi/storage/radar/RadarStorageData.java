@@ -1,4 +1,4 @@
-package net.nullved.pmweatherapi.radar.storage;
+package net.nullved.pmweatherapi.storage.radar;
 
 import dev.protomanly.pmweather.block.RadarBlock;
 import net.minecraft.core.BlockPos;
@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.nullved.pmweatherapi.PMWeatherAPI;
 import net.nullved.pmweatherapi.radar.RadarMode;
 import net.nullved.pmweatherapi.storage.data.StorageData;
+import net.nullved.pmweatherapi.util.PMWUtils;
 
 /**
  * {@link StorageData} for {@link RadarBlock}s.
@@ -56,7 +57,10 @@ public class RadarStorageData extends StorageData {
             boolean on = tag.getBoolean("on");
             return new RadarStorageData(bp, mode, on);
         } else {
-            return new RadarStorageData(NbtUtils.readBlockPos(tag, "").orElseThrow(() -> new IllegalArgumentException("Could not read BlockPos in RadarStorageData!")), RadarMode.get(tag.getString("radar_mode")), !tag.contains("on") || tag.getBoolean("on"));
+            return new RadarStorageData(
+                NbtUtils.readBlockPos(tag, "").orElseThrow(() -> new IllegalArgumentException("Could not read BlockPos in RadarStorageData!")),
+                RadarMode.get(tag.getString("radar_mode")),
+                !tag.contains("on") || tag.getBoolean("on"));
         }
     }
 }

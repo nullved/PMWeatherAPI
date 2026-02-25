@@ -3,7 +3,7 @@ package net.nullved.pmweatherapi.storage.data;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.nullved.pmweatherapi.radar.storage.RadarStorageData;
+import net.nullved.pmweatherapi.storage.radar.RadarStorageData;
 
 /**
  * The interface defining Storage Data such as {@link RadarStorageData}

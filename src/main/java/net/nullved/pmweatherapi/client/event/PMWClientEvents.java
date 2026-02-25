@@ -7,7 +7,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
+import net.nullved.pmweatherapi.client.storage.PMWClientStorages;
 
 @EventBusSubscriber(modid = PMWeatherAPI.MODID, value = Dist.CLIENT)
 public class PMWClientEvents {

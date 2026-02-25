@@ -5,10 +5,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
-import net.nullved.pmweatherapi.radar.storage.RadarStorage;
+import net.nullved.pmweatherapi.client.storage.IClientStorage;
+import net.nullved.pmweatherapi.storage.radar.RadarStorage;
 import net.nullved.pmweatherapi.storage.data.IStorageData;
-import net.nullved.pmweatherapi.storage.data.StorageData;
 
 import java.util.Collection;
 import java.util.Set;

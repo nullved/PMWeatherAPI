@@ -1,10 +1,10 @@
-package net.nullved.pmweatherapi.metar;
+package net.nullved.pmweatherapi.storage.metar;
 
 import dev.protomanly.pmweather.block.MetarBlock;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
-import net.nullved.pmweatherapi.client.metar.MetarClientStorage;
+import net.nullved.pmweatherapi.client.storage.IClientStorage;
+import net.nullved.pmweatherapi.client.storage.metar.MetarClientStorage;
 import net.nullved.pmweatherapi.data.PMWStorages;
 import net.nullved.pmweatherapi.network.S2CMetarPacket;
 import net.nullved.pmweatherapi.network.S2CStoragePacket;

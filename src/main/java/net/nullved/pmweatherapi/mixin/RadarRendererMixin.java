@@ -32,7 +32,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
+import net.nullved.pmweatherapi.client.storage.PMWClientStorages;
 import net.nullved.pmweatherapi.client.render.PixelRenderData;
 import net.nullved.pmweatherapi.client.render.RadarRenderData;
 import net.nullved.pmweatherapi.client.render.radar.RadarOverlays;

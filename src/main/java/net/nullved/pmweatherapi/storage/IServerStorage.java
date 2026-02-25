@@ -6,12 +6,11 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
+import net.nullved.pmweatherapi.client.storage.IClientStorage;
 import net.nullved.pmweatherapi.data.PMWStorages;
 import net.nullved.pmweatherapi.network.PMWNetworking;
 import net.nullved.pmweatherapi.network.S2CStoragePacket;
 import net.nullved.pmweatherapi.storage.data.IStorageData;
-import net.nullved.pmweatherapi.storage.data.StorageData;
 
 import java.util.Collection;
 

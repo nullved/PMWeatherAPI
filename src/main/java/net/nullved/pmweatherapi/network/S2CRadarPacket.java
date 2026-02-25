@@ -6,8 +6,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
-import net.nullved.pmweatherapi.client.radar.RadarClientStorage;
+import net.nullved.pmweatherapi.client.storage.PMWClientStorages;
+import net.nullved.pmweatherapi.client.storage.radar.RadarClientStorage;
 
 /**
  * The packet that syncs radars from the server to the client, using the Storages system
@@ -37,7 +37,7 @@ public class S2CRadarPacket extends S2CStoragePacket<RadarClientStorage> {
     }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public Type<S2CRadarPacket> type() {
         return TYPE;
     }
 }

@@ -1,15 +1,12 @@
-package net.nullved.pmweatherapi.client.metar;
+package net.nullved.pmweatherapi.client.storage.metar;
 
 import dev.protomanly.pmweather.block.MetarBlock;
-import dev.protomanly.pmweather.block.RadarBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
-import net.nullved.pmweatherapi.metar.MetarStorage;
-import net.nullved.pmweatherapi.metar.MetarStorageData;
-import net.nullved.pmweatherapi.radar.storage.RadarStorage;
-import net.nullved.pmweatherapi.radar.storage.RadarStorageData;
+import net.nullved.pmweatherapi.client.storage.IClientStorage;
+import net.nullved.pmweatherapi.client.storage.PMWClientStorages;
+import net.nullved.pmweatherapi.storage.metar.MetarStorage;
+import net.nullved.pmweatherapi.storage.metar.MetarStorageData;
 
 /**
  * A {@link IClientStorage} implementation for {@link MetarBlock}s

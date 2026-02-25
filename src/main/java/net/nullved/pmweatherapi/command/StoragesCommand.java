@@ -13,13 +13,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
+import net.nullved.pmweatherapi.client.storage.IClientStorage;
+import net.nullved.pmweatherapi.client.storage.PMWClientStorages;
 import net.nullved.pmweatherapi.data.PMWStorages;
 import net.nullved.pmweatherapi.storage.IServerStorage;
 import net.nullved.pmweatherapi.storage.IStorage;
 import net.nullved.pmweatherapi.storage.data.IStorageData;
-import net.nullved.pmweatherapi.storage.data.StorageData;
 import net.nullved.pmweatherapi.util.PMWUtils;
 
 import java.util.Set;

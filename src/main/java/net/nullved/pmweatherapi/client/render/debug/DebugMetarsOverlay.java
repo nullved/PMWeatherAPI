@@ -1,7 +1,7 @@
 package net.nullved.pmweatherapi.client.render.debug;
 
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
+import net.nullved.pmweatherapi.client.storage.PMWClientStorages;
 import net.nullved.pmweatherapi.client.render.RadarRenderData;
 import net.nullved.pmweatherapi.client.render.radar.IRadarOverlay;
 

@@ -4,13 +4,13 @@ import dev.protomanly.pmweather.event.GameBusClientEvents;
 import dev.protomanly.pmweather.event.GameBusEvents;
 import dev.protomanly.pmweather.weather.Storm;
 import dev.protomanly.pmweather.weather.WeatherHandler;
+import dev.protomanly.pmweather.weather.storms.StormType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.nullved.pmweatherapi.util.StormType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -168,7 +168,7 @@ public class NearbyStorms {
 
         for (Storm storm: allStorms) {
             Vec3 pos = storm.position;
-            if (pos.distanceTo(block.getCenter()) <= radius && type.matches(storm)) nearStorms.add(storm);
+            if (pos.distanceTo(block.getCenter()) <= radius && storm.stormType.equals(type)) nearStorms.add(storm);
         }
 
         return nearStorms;
@@ -188,7 +188,7 @@ public class NearbyStorms {
 
         for (Storm storm: allStorms) {
             Vec3 pos = storm.position;
-            if (pos.distanceTo(chunk.getWorldPosition().getCenter()) <= radius && type.matches(storm)) nearStorms.add(storm);
+            if (pos.distanceTo(chunk.getWorldPosition().getCenter()) <= radius && storm.stormType.equals(type)) nearStorms.add(storm);
         }
 
         return nearStorms;
@@ -208,7 +208,7 @@ public class NearbyStorms {
 
         for (Storm storm: allStorms) {
             Vec3 pos = storm.position;
-            if (pos.distanceTo(player.position()) <= radius && type.matches(storm)) nearStorms.add(storm);
+            if (pos.distanceTo(player.position()) <= radius && storm.stormType.equals(type)) nearStorms.add(storm);
         }
 
         return nearStorms;

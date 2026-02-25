@@ -1,12 +1,11 @@
-package net.nullved.pmweatherapi.radar.storage;
+package net.nullved.pmweatherapi.storage.wsr;
 
 import dev.protomanly.pmweather.multiblock.wsr88d.WSR88DCore;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
-import net.nullved.pmweatherapi.client.radar.WSRClientStorage;
+import net.nullved.pmweatherapi.client.storage.IClientStorage;
+import net.nullved.pmweatherapi.client.storage.wsr.WSRClientStorage;
 import net.nullved.pmweatherapi.data.PMWStorages;
-import net.nullved.pmweatherapi.network.S2CRadarPacket;
 import net.nullved.pmweatherapi.network.S2CStoragePacket;
 import net.nullved.pmweatherapi.network.S2CWSRPacket;
 import net.nullved.pmweatherapi.storage.IServerStorage;

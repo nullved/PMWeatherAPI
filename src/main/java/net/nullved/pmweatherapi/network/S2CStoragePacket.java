@@ -6,7 +6,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
+import net.nullved.pmweatherapi.client.storage.IClientStorage;
 
 /**
  * A base packet for the Storages system that syncs data from the Server -> Client (S2C)
@@ -78,4 +78,7 @@ public abstract class S2CStoragePacket<C extends IClientStorage<?>> implements C
             PMWeatherAPI.LOGGER.error("An error occurred when trying to write packet", e);
         }
     }
+
+    @Override
+    abstract public Type<? extends S2CStoragePacket<?>> type();
 }

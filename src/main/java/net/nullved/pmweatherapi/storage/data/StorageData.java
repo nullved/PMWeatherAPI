@@ -5,10 +5,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
-import net.nullved.pmweatherapi.metar.MetarStorageData;
-import net.nullved.pmweatherapi.radar.storage.RadarStorageData;
-import net.nullved.pmweatherapi.radar.storage.WSRStorageData;
+import net.nullved.pmweatherapi.client.storage.IClientStorage;
+import net.nullved.pmweatherapi.storage.metar.MetarStorageData;
+import net.nullved.pmweatherapi.storage.radar.RadarStorageData;
+import net.nullved.pmweatherapi.storage.wsr.WSRStorageData;
 import net.nullved.pmweatherapi.storage.IServerStorage;
 import net.nullved.pmweatherapi.storage.IStorage;
 

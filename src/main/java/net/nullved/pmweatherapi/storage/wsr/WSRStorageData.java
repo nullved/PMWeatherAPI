@@ -1,4 +1,4 @@
-package net.nullved.pmweatherapi.radar.storage;
+package net.nullved.pmweatherapi.storage.wsr;
 
 import dev.protomanly.pmweather.multiblock.wsr88d.WSR88DCore;
 import net.minecraft.core.BlockPos;

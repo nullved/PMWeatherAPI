@@ -17,7 +17,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.nullved.pmweatherapi.PMWeatherAPI;
 import net.nullved.pmweatherapi.command.StoragesCommand;
 import net.nullved.pmweatherapi.data.PMWStorages;
-import net.nullved.pmweatherapi.metar.MetarStorageData;
+import net.nullved.pmweatherapi.storage.metar.MetarStorageData;
 import net.nullved.pmweatherapi.storage.IServerStorage;
 import net.nullved.pmweatherapi.storage.ISyncServerStorage;
 

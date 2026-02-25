@@ -3,11 +3,8 @@ package net.nullved.pmweatherapi.client.storage;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.data.IClientStorage;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
 import net.nullved.pmweatherapi.storage.StorageInstance;
 import net.nullved.pmweatherapi.storage.data.IStorageData;
-import net.nullved.pmweatherapi.storage.data.StorageData;
 
 import java.util.Optional;
 import java.util.function.Function;

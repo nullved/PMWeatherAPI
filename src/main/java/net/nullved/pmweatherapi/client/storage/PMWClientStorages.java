@@ -1,26 +1,26 @@
-package net.nullved.pmweatherapi.client.data;
+package net.nullved.pmweatherapi.client.storage;
 
 import dev.protomanly.pmweather.block.entity.RadarBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.metar.MetarClientStorage;
-import net.nullved.pmweatherapi.client.radar.RadarClientStorage;
-import net.nullved.pmweatherapi.client.radar.WSRClientStorage;
-import net.nullved.pmweatherapi.client.storage.ClientStorageInstance;
-import net.nullved.pmweatherapi.metar.MetarStorage;
-import net.nullved.pmweatherapi.metar.MetarStorageData;
+import net.nullved.pmweatherapi.client.storage.metar.MetarClientStorage;
+import net.nullved.pmweatherapi.client.storage.radar.RadarClientStorage;
+import net.nullved.pmweatherapi.client.storage.radar.RangeUpgradeClientStorage;
+import net.nullved.pmweatherapi.client.storage.wsr.WSRClientStorage;
+import net.nullved.pmweatherapi.storage.data.BlockPosData;
+import net.nullved.pmweatherapi.storage.metar.MetarStorage;
+import net.nullved.pmweatherapi.storage.metar.MetarStorageData;
 import net.nullved.pmweatherapi.radar.RadarMode;
-import net.nullved.pmweatherapi.radar.storage.RadarStorage;
-import net.nullved.pmweatherapi.radar.storage.WSRStorage;
-import net.nullved.pmweatherapi.radar.storage.WSRStorageData;
+import net.nullved.pmweatherapi.storage.radar.RadarStorage;
+import net.nullved.pmweatherapi.storage.radar.RangeUpgradeStorage;
+import net.nullved.pmweatherapi.storage.wsr.WSRStorage;
+import net.nullved.pmweatherapi.storage.wsr.WSRStorageData;
 import net.nullved.pmweatherapi.storage.data.IStorageData;
-import net.nullved.pmweatherapi.storage.data.StorageData;
-import net.nullved.pmweatherapi.radar.storage.RadarStorageData;
+import net.nullved.pmweatherapi.storage.radar.RadarStorageData;
 
 import java.awt.*;
 import java.util.Collection;
@@ -70,6 +70,15 @@ public class PMWClientStorages {
      */
     public static ClientStorageInstance<WSRStorageData, WSRClientStorage> wsrs() {
         return get(WSRStorage.ID, WSRClientStorage.class).orElseThrow();
+    }
+
+    /**
+     * Gets the {@link ClientStorageInstance} of the {@link RangeUpgradeClientStorage}
+     * @return The {@link ClientStorageInstance}
+     * @since 0.16.4.0
+     */
+    public static ClientStorageInstance<BlockPosData, RangeUpgradeClientStorage> rangeUpgrades() {
+        return get(RangeUpgradeStorage.ID, RangeUpgradeClientStorage.class).orElseThrow();
     }
 
     /**

@@ -1,8 +1,8 @@
 package net.nullved.pmweatherapi.mixin;
 
 import dev.protomanly.pmweather.block.MetarBlock;
+import dev.protomanly.pmweather.block.ModBlocks;
 import dev.protomanly.pmweather.block.RadarBlock;
-import dev.protomanly.pmweather.block.entity.RadarBlockEntity;
 import dev.protomanly.pmweather.event.GameBusEvents;
 import dev.protomanly.pmweather.multiblock.wsr88d.WSR88DCore;
 import dev.protomanly.pmweather.weather.Sounding;
@@ -16,12 +16,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.nullved.pmweatherapi.data.PMWExtras;
 import net.nullved.pmweatherapi.data.PMWStorages;
-import net.nullved.pmweatherapi.metar.MetarServerStorage;
-import net.nullved.pmweatherapi.metar.MetarStorageData;
-import net.nullved.pmweatherapi.radar.RadarMode;
-import net.nullved.pmweatherapi.radar.storage.RadarServerStorage;
-import net.nullved.pmweatherapi.radar.storage.RadarStorageData;
-import net.nullved.pmweatherapi.radar.storage.WSRStorageData;
+import net.nullved.pmweatherapi.storage.data.BlockPosData;
+import net.nullved.pmweatherapi.storage.metar.MetarServerStorage;
+import net.nullved.pmweatherapi.storage.metar.MetarStorageData;
+import net.nullved.pmweatherapi.storage.radar.RadarServerStorage;
+import net.nullved.pmweatherapi.storage.radar.RadarStorageData;
+import net.nullved.pmweatherapi.storage.wsr.WSRStorageData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -56,6 +56,8 @@ public class BlockBehaviourMixin {
             metarStorage.addAndSync(new MetarStorageData(pos, temp, dew, (float) windAngle, (float) windspeed, riskV));
         } else if (state.getBlock() instanceof WSR88DCore wsr) {
             PMWStorages.wsrs().get(level.dimension()).addAndSync(new WSRStorageData(pos, wsr.isComplete(state)));
+        } else if (state.getBlock().equals(ModBlocks.RANGE_UPGRADE_MODULE.get())) {
+            PMWStorages.rangeUpgrades().get(level.dimension()).addAndSync(new BlockPosData(pos));
         }
     }
 
@@ -69,6 +71,8 @@ public class BlockBehaviourMixin {
             metarStorage.removeAndSync(pos);
         } else if (state.getBlock() instanceof WSR88DCore) {
             PMWStorages.wsrs().get(level.dimension()).removeAndSync(pos);
+        } else if (state.getBlock().equals(ModBlocks.RANGE_UPGRADE_MODULE.get())) {
+            PMWStorages.rangeUpgrades().get(level.dimension()).removeAndSync(pos);
         }
     }
 }

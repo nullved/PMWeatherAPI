@@ -14,21 +14,23 @@ import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
-import net.nullved.pmweatherapi.client.metar.MetarClientStorage;
-import net.nullved.pmweatherapi.client.radar.RadarClientStorage;
-import net.nullved.pmweatherapi.client.radar.WSRClientStorage;
-import net.nullved.pmweatherapi.client.render.IDOverlay;
-import net.nullved.pmweatherapi.client.render.radar.RadarOverlays;
+import net.nullved.pmweatherapi.client.storage.PMWClientStorages;
+import net.nullved.pmweatherapi.client.storage.metar.MetarClientStorage;
+import net.nullved.pmweatherapi.client.storage.radar.RadarClientStorage;
+import net.nullved.pmweatherapi.client.storage.radar.RangeUpgradeClientStorage;
+import net.nullved.pmweatherapi.client.storage.wsr.WSRClientStorage;
 import net.nullved.pmweatherapi.config.PMWClientConfig;
 import net.nullved.pmweatherapi.data.PMWStorages;
-import net.nullved.pmweatherapi.metar.MetarServerStorage;
-import net.nullved.pmweatherapi.metar.MetarStorage;
-import net.nullved.pmweatherapi.metar.MetarStorageData;
+import net.nullved.pmweatherapi.storage.metar.MetarServerStorage;
+import net.nullved.pmweatherapi.storage.metar.MetarStorage;
+import net.nullved.pmweatherapi.storage.metar.MetarStorageData;
 import net.nullved.pmweatherapi.network.PMWNetworking;
-import net.nullved.pmweatherapi.radar.storage.*;
 import net.nullved.pmweatherapi.storage.data.BlockPosData;
 import net.nullved.pmweatherapi.storage.data.StorageDataManager;
+import net.nullved.pmweatherapi.storage.radar.*;
+import net.nullved.pmweatherapi.storage.wsr.WSRServerStorage;
+import net.nullved.pmweatherapi.storage.wsr.WSRStorage;
+import net.nullved.pmweatherapi.storage.wsr.WSRStorageData;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -67,6 +69,7 @@ public class PMWeatherAPI {
         PMWStorages.registerStorage(RadarStorage.ID, RadarServerStorage.class, RadarServerStorage::new);
         PMWStorages.registerStorage(MetarStorage.ID, MetarServerStorage.class, MetarServerStorage::new);
         PMWStorages.registerStorage(WSRStorage.ID, WSRServerStorage.class, WSRServerStorage::new);
+        PMWStorages.registerStorage(RangeUpgradeStorage.ID, RangeUpgradeServerStorage.class, RangeUpgradeServerStorage::new);
     }
 
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
@@ -80,6 +83,7 @@ public class PMWeatherAPI {
         PMWClientStorages.registerStorage(RadarStorage.ID, RadarClientStorage.class, RadarClientStorage::new);
         PMWClientStorages.registerStorage(MetarStorage.ID, MetarClientStorage.class, MetarClientStorage::new);
         PMWClientStorages.registerStorage(WSRStorage.ID, WSRClientStorage.class, WSRClientStorage::new);
+        PMWClientStorages.registerStorage(RangeUpgradeStorage.ID, RangeUpgradeClientStorage.class, RangeUpgradeClientStorage::new);
     }
     public static ResourceLocation rl(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);

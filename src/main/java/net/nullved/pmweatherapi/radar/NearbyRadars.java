@@ -8,11 +8,10 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.nullved.pmweatherapi.client.data.PMWClientStorages;
+import net.nullved.pmweatherapi.client.storage.PMWClientStorages;
 import net.nullved.pmweatherapi.data.PMWStorages;
-import net.nullved.pmweatherapi.radar.storage.RadarStorage;
-import net.nullved.pmweatherapi.radar.storage.RadarStorageData;
-import net.nullved.pmweatherapi.storage.data.BlockPosData;
+import net.nullved.pmweatherapi.storage.radar.RadarStorage;
+import net.nullved.pmweatherapi.storage.radar.RadarStorageData;
 import net.nullved.pmweatherapi.storage.data.StorageData;
 
 import java.util.HashMap;

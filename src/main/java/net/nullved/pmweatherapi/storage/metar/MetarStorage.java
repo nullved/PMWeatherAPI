@@ -1,28 +1,30 @@
-package net.nullved.pmweatherapi.radar.storage;
+package net.nullved.pmweatherapi.storage.metar;
 
-import dev.protomanly.pmweather.multiblock.wsr88d.WSR88DCore;
+import dev.protomanly.pmweather.block.MetarBlock;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.radar.WSRClientStorage;
+import net.nullved.pmweatherapi.client.storage.metar.MetarClientStorage;
 import net.nullved.pmweatherapi.storage.PMWStorage;
 
 /**
- * {@link PMWStorage} for {@link WSR88DCore}s
+ * {@link PMWStorage} for {@link MetarBlock}s
  *
  * @since 0.15.3.3
  * @see PMWStorage
- * @see WSRServerStorage
- * @see WSRClientStorage
+ * @see MetarServerStorage
+ * @see MetarClientStorage
  */
-public abstract class WSRStorage extends PMWStorage<WSRStorageData> {
+public abstract class MetarStorage extends PMWStorage<MetarStorageData> {
     public static final int VERSION = 1;
-    public static final ResourceLocation ID = PMWeatherAPI.rl("wsrs");
+    public static final ResourceLocation ID = PMWeatherAPI.rl("metars");
 
-    public WSRStorage(ResourceKey<Level> dimension) {
+    public MetarStorage(ResourceKey<Level> dimension) {
         super(dimension);
     }
+
+    public abstract Level getLevel();
 
     @Override
     public ResourceLocation getId() {
@@ -31,7 +33,7 @@ public abstract class WSRStorage extends PMWStorage<WSRStorageData> {
 
     @Override
     public ResourceLocation getExpectedDataType() {
-        return WSRStorageData.ID;
+        return MetarStorageData.ID;
     }
 
     @Override

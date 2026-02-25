@@ -1,4 +1,4 @@
-package net.nullved.pmweatherapi.metar;
+package net.nullved.pmweatherapi.storage.metar;
 
 import dev.protomanly.pmweather.block.MetarBlock;
 import net.minecraft.core.BlockPos;

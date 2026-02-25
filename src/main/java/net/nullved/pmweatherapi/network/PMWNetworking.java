@@ -9,7 +9,8 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import net.nullved.pmweatherapi.radar.storage.RadarServerStorage;
+import net.nullved.pmweatherapi.storage.radar.RadarServerStorage;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -28,6 +29,7 @@ public class PMWNetworking {
         registerClientboundPacket(S2CRadarPacket.TYPE, S2CRadarPacket.STREAM_CODEC, S2CRadarPacket::handle, args);
         registerClientboundPacket(S2CMetarPacket.TYPE, S2CMetarPacket.STREAM_CODEC, S2CMetarPacket::handle, args);
         registerClientboundPacket(S2CWSRPacket.TYPE, S2CWSRPacket.STREAM_CODEC, S2CWSRPacket::handle, args);
+        registerClientboundPacket(S2CRangeUpgradePacket.TYPE, S2CRangeUpgradePacket.STREAM_CODEC, S2CRangeUpgradePacket::handle, args);
     }
 
     /**

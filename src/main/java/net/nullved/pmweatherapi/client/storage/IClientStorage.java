@@ -1,10 +1,10 @@
-package net.nullved.pmweatherapi.client.data;
+package net.nullved.pmweatherapi.client.storage;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.client.radar.RadarClientStorage;
+import net.nullved.pmweatherapi.client.storage.radar.RadarClientStorage;
 import net.nullved.pmweatherapi.network.S2CStoragePacket;
 import net.nullved.pmweatherapi.storage.IStorage;
 import net.nullved.pmweatherapi.storage.data.IStorageData;

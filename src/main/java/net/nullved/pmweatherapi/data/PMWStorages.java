@@ -5,14 +5,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.nullved.pmweatherapi.PMWeatherAPI;
-import net.nullved.pmweatherapi.metar.MetarServerStorage;
-import net.nullved.pmweatherapi.metar.MetarStorage;
-import net.nullved.pmweatherapi.metar.MetarStorageData;
-import net.nullved.pmweatherapi.radar.storage.*;
+import net.nullved.pmweatherapi.storage.data.BlockPosData;
+import net.nullved.pmweatherapi.storage.metar.MetarServerStorage;
+import net.nullved.pmweatherapi.storage.metar.MetarStorage;
+import net.nullved.pmweatherapi.storage.metar.MetarStorageData;
 import net.nullved.pmweatherapi.storage.IServerStorage;
 import net.nullved.pmweatherapi.storage.StorageInstance;
 import net.nullved.pmweatherapi.storage.data.IStorageData;
-import net.nullved.pmweatherapi.storage.data.StorageData;
+import net.nullved.pmweatherapi.storage.radar.*;
+import net.nullved.pmweatherapi.storage.wsr.WSRServerStorage;
+import net.nullved.pmweatherapi.storage.wsr.WSRStorage;
+import net.nullved.pmweatherapi.storage.wsr.WSRStorageData;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,8 +31,8 @@ public class PMWStorages {
     public static final Map<ResourceLocation, StorageInstance<?, ?>> STORAGE_INSTANCES = new HashMap<>();
 
     /**
-     * Gets the map of {@link RadarServerStorage}s
-     * @return The associated dimension's {@link RadarServerStorage}
+     * Gets the {@link StorageInstance}  of {@link RadarServerStorage}s
+     * @return The radar {@link StorageInstance}
      * @since 0.14.15.3
      */
     public static StorageInstance<RadarStorageData, RadarServerStorage> radars() {
@@ -37,8 +40,8 @@ public class PMWStorages {
     }
 
     /**
-     * Gets the map of {@link MetarServerStorage}s
-     * @return The associated dimension's {@link MetarServerStorage}
+     * Gets the {@link StorageInstance}  of {@link MetarServerStorage}s
+     * @return The metar {@link StorageInstance}
      * @since 0.15.3.3
      */
     public static StorageInstance<MetarStorageData, MetarServerStorage> metars() {
@@ -46,12 +49,21 @@ public class PMWStorages {
     }
 
     /**
-     * Gets the map of {@link WSRServerStorage}s
-     * @return The associated dimension's {@link WSRServerStorage}
+     * Gets the {@link StorageInstance}  of {@link WSRServerStorage}s
+     * @return The WSR {@link StorageInstance}
      * @since 0.15.3.3
      */
     public static StorageInstance<WSRStorageData, WSRServerStorage> wsrs() {
         return get(WSRStorage.ID, WSRServerStorage.class).orElseThrow();
+    }
+
+    /**
+     * Gets the {@link StorageInstance} of {@link RangeUpgradeServerStorage}s
+     * @return The range upgrade module {@link StorageInstance}
+     * @since 0.16.4.0
+     */
+    public static StorageInstance<BlockPosData, RangeUpgradeServerStorage> rangeUpgrades() {
+        return get(RangeUpgradeStorage.ID, RangeUpgradeServerStorage.class).orElseThrow();
     }
 
     /**
