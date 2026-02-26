@@ -220,8 +220,8 @@ public class RadarRendererMixin {
             }
 
             if (!RadarMode.isBaseRenderingDisabled()) {
-                int a = (int) (FastColor.ARGB32.alpha(color) * 0.75F + 0.25F);
-                color = (a << 24) | color & 0xFFFFFF;
+//                int a = (int) (FastColor.ARGB32.alpha(color) * 0.75F + 0.25F);
+//                color = (a << 24) | color & 0xFFFFFF;
 
                 pmwapi$renderQuad(vc, px, 0.0F, pz, size / 4.0F, poseStack, color, combinedLightIn);
             }
